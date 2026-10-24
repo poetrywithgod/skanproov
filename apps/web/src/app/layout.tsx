@@ -1,4 +1,4 @@
-import "@fontsource-variable/inter";
+import "@fontsource-variable/plus-jakarta-sans";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { site } from "@/lib/site";
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { type: "website", siteName: site.name, locale: "en_NG" },
 };
 
-export const viewport: Viewport = { themeColor: "#02703f", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#0a7a4a", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

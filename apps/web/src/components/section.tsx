@@ -15,7 +15,7 @@ const tones = {
 
 export function Section({ id, tone = "white", children }: Props) {
   return (
-    <section id={id} className={`${tones[tone]} scroll-mt-16`}>
+    <section id={id} className={`${tones[tone]} scroll-mt-[65px]`}>
       <div className="mx-auto max-w-6xl px-5 py-14 md:py-24">{children}</div>
     </section>
   );
