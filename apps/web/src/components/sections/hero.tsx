@@ -14,7 +14,7 @@ export function Hero() {
     <section className="mx-auto max-w-6xl px-6 pb-[90px] pt-16">
       <p className="text-sm font-medium leading-5 text-brand">{site.tagline}</p>
 
-      <h1 className="mt-4 max-w-[820px] text-[40px] font-bold leading-none sm:text-5xl md:text-[60px]">
+      <h1 className="mt-4 max-w-[820px] text-[40px] leading-none sm:text-5xl md:text-[60px]">
         Know it&apos;s genuine before you buy it.
       </h1>
 

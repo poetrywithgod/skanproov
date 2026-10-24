@@ -20,7 +20,7 @@ export function Intelligence() {
     <Section id="intelligence" tone="dark">
       <div className="grid gap-10 md:grid-cols-2 md:items-center">
         <div>
-          <h2 className="text-3xl font-bold leading-tight md:text-5xl">Every scan tells you something.</h2>
+          <h2 className="text-3xl leading-tight md:text-5xl">Every scan tells you something.</h2>
           <p className="mt-4 max-w-md text-sm text-white/70 md:text-base">
             Brands see what their products see, and get answers to the questions counterfeiters hope you never ask.
           </p>

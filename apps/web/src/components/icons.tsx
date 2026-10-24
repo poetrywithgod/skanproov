@@ -56,7 +56,10 @@ export function PinIcon(props: IconProps) {
 export function QrIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>
-      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-4M14 18v2" />
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <path d="M6.5 6.5h.01M17.5 6.5h.01M6.5 17.5h.01M14 14h3v3M21 14v.01M14 21h3M21 17v4" />
     </svg>
   );
 }

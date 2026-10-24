@@ -26,7 +26,7 @@ export function ButtonLink({ variant = "primary", size = "lg", className = "", c
   return (
     <Link
       {...props}
-      className={`inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${sizes[size]} ${variants[variant]} ${className}`}
+      className={`inline-flex items-center justify-center text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${sizes[size]} ${variants[variant]} ${className}`}
     >
       {children}
     </Link>

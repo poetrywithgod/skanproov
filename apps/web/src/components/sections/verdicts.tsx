@@ -10,7 +10,7 @@ export function Verdicts() {
     <Section>
       <div className="grid gap-12 md:grid-cols-2 md:items-center">
         <div>
-          <h2 className="text-3xl font-bold leading-tight md:text-5xl">The simplest part of the product.</h2>
+          <h2 className="text-3xl leading-tight md:text-5xl">The simplest part of the product.</h2>
           <p className="mt-4 max-w-md text-sm text-muted md:text-base">
             No account. No app. No complicated registration. Scan the code, wait a moment, and get an answer in plain
             language.
@@ -33,7 +33,7 @@ export function Verdicts() {
           </div>
         </div>
 
-        <div className="flex items-start justify-center gap-4">
+        <div className="flex items-start justify-center gap-3 sm:gap-4">
           <Phone>
             <div className="bg-brand px-4 pb-6 pt-4 text-center text-white">
               <p className="text-[9px] font-bold tracking-wide">SKANPROOV</p>

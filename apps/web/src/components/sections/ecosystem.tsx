@@ -19,7 +19,7 @@ export function Ecosystem() {
         sizes="(min-width: 1152px) 1112px, 90vw"
         className="aspect-[3/2] w-full rounded-lg object-cover md:aspect-[2.2/1]"
       />
-      <h2 className="mt-10 max-w-xl text-3xl font-bold leading-tight md:text-5xl">
+      <h2 className="mt-10 max-w-xl text-3xl leading-tight md:text-5xl">
         One ecosystem. Four sides, all connected.
       </h2>
       <p className="mt-4 max-w-md text-sm text-muted md:text-base">

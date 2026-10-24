@@ -7,7 +7,7 @@ export function CtaBand() {
   return (
     <Section tone="brand">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-3xl font-bold leading-tight md:text-5xl">Protect your brand. Protect your customers.</h2>
+        <h2 className="text-3xl leading-tight md:text-5xl">Protect your brand. Protect your customers.</h2>
         <p className="mt-4 text-sm text-white/80">See SKANPROOV working on your products.</p>
         <div className="mt-6">
           <ButtonLink href={site.links.demo} variant="light">

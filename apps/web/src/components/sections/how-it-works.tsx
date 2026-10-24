@@ -9,16 +9,18 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <Section id="how-it-works">
-      <h2 className="max-w-xl text-3xl font-bold leading-tight md:text-5xl">From factory to shelf to your hand.</h2>
-      <ol className="mt-10 grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+    <Section id="how-it-works" className="pb-14 pt-14 md:pb-[81px] md:pt-[81px]">
+      <h2 className="max-w-[480px] text-[34px] leading-none sm:text-[40px] md:text-5xl">
+        From factory to shelf to your hand.
+      </h2>
+      <ol className="mt-10 grid gap-x-10 gap-y-10 sm:grid-cols-2 md:mt-[63px] md:gap-y-[41px]">
         {steps.map((step, i) => (
           <li key={step.title}>
-            <span className="grid size-7 place-items-center rounded-full bg-ink text-xs font-semibold text-white">
+            <span className="grid size-10 place-items-center rounded-full bg-ink text-sm font-semibold text-white">
               {i + 1}
             </span>
-            <h3 className="mt-4 text-sm font-bold tracking-normal">{step.title}</h3>
-            <p className="mt-1 text-xs leading-relaxed text-muted md:text-sm">{step.body}</p>
+            <h3 className="mt-[25px] text-lg font-bold leading-6 text-ink">{step.title}</h3>
+            <p className="mt-[10px] max-w-[320px] text-base leading-[26px] text-body">{step.body}</p>
           </li>
         ))}
       </ol>

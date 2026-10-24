@@ -9,35 +9,35 @@ const questions = [
 
 export function Problem() {
   return (
-    <Section tone="tint">
-      <div className="grid gap-10 md:grid-cols-2 md:items-center">
-        <div>
-          <h2 className="text-3xl font-bold leading-tight md:text-5xl">A QR code that works is not proof.</h2>
-          <p className="mt-4 max-w-md text-sm text-muted md:text-base">
-            Anyone can print a QR code. Real protection means knowing the exact item in your hand.
+    <Section tone="tint" className="pb-14 pt-14 md:pb-20 md:pt-[81px]">
+      <h2 className="max-w-[720px] text-[34px] leading-none sm:text-[40px] md:text-5xl">
+        A QR code that works is not proof.
+      </h2>
+      <p className="mt-5 max-w-[672px] text-lg leading-[1.6] text-body">
+        Anyone can print a QR code. Real protection means knowing the exact item in your hand.
+      </p>
+
+      <div className="mt-10 md:mt-[55px]">
+        <div className="rounded-2xl border border-line-strong px-5 pb-8 pt-6 sm:px-8 sm:pb-[47px] sm:pt-[34px]">
+          <p className="text-sm font-medium leading-4 text-label">What most tools ask</p>
+          <p className="mt-[18px] text-xl font-semibold leading-8 text-body sm:text-2xl">Does this QR code work?</p>
+          <p className="mt-[25px] flex items-center gap-3 text-sm leading-5 text-label">
+            <QrIcon className="size-5 shrink-0" />A copied code passes this test every time.
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="rounded-lg border border-line bg-white/60 p-5">
-            <p className="text-xs text-muted">What most tools ask</p>
-            <p className="mt-2 text-lg font-semibold">Does this QR code work?</p>
-            <p className="mt-2 flex items-center gap-2 text-xs text-muted">
-              <QrIcon className="size-4" />A copied code passes this test every time.
-            </p>
-          </div>
-
-          <div className="rounded-lg bg-brand p-5 text-white">
-            <p className="text-xs opacity-80">What SKANPROOV asks</p>
-            <ul className="mt-3 space-y-3">
-              {questions.map((q) => (
-                <li key={q} className="flex items-start gap-3 text-sm font-semibold">
-                  <CheckIcon className="mt-0.5 size-4 shrink-0 rounded-full bg-white/20 p-0.5" />
-                  {q}
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="mt-4 rounded-2xl bg-brand px-5 pb-[35px] pt-8 text-white sm:px-8">
+          <p className="text-sm font-medium leading-4 text-white/80">What SKANPROOV asks</p>
+          <ul className="mt-[21px] space-y-[15.5px]">
+            {questions.map((q) => (
+              <li key={q} className="flex min-h-7 items-center gap-3 text-base font-semibold leading-7 sm:text-xl">
+                <span className="grid size-6 shrink-0 place-items-center rounded-full bg-white/20">
+                  <CheckIcon className="size-4" strokeWidth={3.5} />
+                </span>
+                {q}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </Section>
