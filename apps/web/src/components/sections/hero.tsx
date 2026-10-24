@@ -11,7 +11,7 @@ const details = [
 
 export function Hero() {
   return (
-    <section className="mx-auto max-w-6xl px-6 pb-[90px] pt-16">
+    <section className="mx-auto max-w-6xl px-6 pb-[88.95px] pt-16">
       <p className="text-sm font-medium leading-5 text-brand">{site.tagline}</p>
 
       <h1 className="mt-4 max-w-[820px] text-[40px] leading-none sm:text-5xl md:text-[60px]">

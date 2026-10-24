@@ -14,8 +14,11 @@
   --color-header: #e8e8e8;
   --color-line: #e1e5e1;
   --color-line-strong: #c9d0cb;
+  --color-divider: #dfe4df;
+  --color-brand-deep: #086640;
+  --color-brand-soft: #e3f1e9;
   --color-label: #515d56;
-  --color-danger: #c8372d;
+  --color-danger: #b42318;
   --color-danger-soft: #fdecea;
 }
 
@@ -36,12 +39,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2 {
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
+@layer base {
+  h1,
+  h2 {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
 
-h1 {
-  letter-spacing: -0.035em;
+  h1 {
+    letter-spacing: -0.035em;
+  }
 }

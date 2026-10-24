@@ -10,26 +10,28 @@ const sides = [
 
 export function Ecosystem() {
   return (
-    <Section id="who-its-for" tone="tint">
+    <Section id="who-its-for" tone="tint" className="pb-16 pt-14 md:pt-20">
       <Image
         src="/images/shopper.jpg"
         alt="A shopper checking a product with their phone in a neighbourhood store"
-        width={1200}
-        height={800}
-        sizes="(min-width: 1152px) 1112px, 90vw"
-        className="aspect-[3/2] w-full rounded-lg object-cover md:aspect-[2.2/1]"
+        width={895}
+        height={672}
+        sizes="(min-width: 943px) 895px, 100vw"
+        className="aspect-[895/672] w-full rounded-3xl object-cover"
       />
-      <h2 className="mt-10 max-w-xl text-3xl leading-tight md:text-5xl">
+
+      <h2 className="mt-[62px] max-w-[760px] text-[34px] leading-none tracking-normal sm:text-[40px] md:text-5xl">
         One ecosystem. Four sides, all connected.
       </h2>
-      <p className="mt-4 max-w-md text-sm text-muted md:text-base">
+      <p className="mt-[27px] max-w-[520px] text-lg leading-[30px] text-body">
         Most tools stop at a QR check. SKANPROOV links everyone who touches a product.
       </p>
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+
+      <div className="mt-[40.6px] grid gap-x-10 sm:grid-cols-2">
         {sides.map((side) => (
-          <div key={side.title}>
-            <h3 className="text-sm font-bold tracking-normal">{side.title}</h3>
-            <p className="mt-1 text-xs leading-relaxed text-muted md:text-sm">{side.body}</p>
+          <div key={side.title} className="border-t border-divider pb-[25px] pt-[23px]">
+            <h3 className="text-base font-bold leading-6 text-ink">{side.title}</h3>
+            <p className="mt-2 text-base leading-[26px] text-body">{side.body}</p>
           </div>
         ))}
       </div>
