@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand tokens, sampled from the landing page design. Confirm against Amaka's final palette. */
+  --color-brand: #02703f;
+  --color-brand-dark: #015a33;
+  --color-ink: #0f2113;
+  --color-tint: #ebedea;
+  --color-muted: #5b6b61;
+  --color-line: #dfe3de;
+  --color-danger: #c8372d;
+  --color-danger-soft: #fdecea;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: #fff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
