@@ -12,15 +12,6 @@ const base = {
   "aria-hidden": true,
 } as const;
 
-export function ShieldIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M12 3 5 6v5c0 4.4 2.9 8.3 7 10 4.1-1.7 7-5.6 7-10V6l-7-3Z" />
-      <path d="M9 9H8v1M15 9h1v1M9 15H8v-1M15 15h1v-1" />
-    </svg>
-  );
-}
-
 export function ScanIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

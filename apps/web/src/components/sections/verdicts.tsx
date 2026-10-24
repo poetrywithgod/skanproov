@@ -1,6 +1,6 @@
 import { site } from "@/lib/site";
 import { ButtonLink } from "../button";
-import { CheckIcon, CloseIcon, FlagIcon, ShieldIcon } from "../icons";
+import { CheckIcon, CloseIcon, FlagIcon } from "../icons";
 import { Phone } from "../phone";
 import { ProductDetails } from "../product-details";
 import { Section } from "../section";
@@ -36,9 +36,7 @@ export function Verdicts() {
         <div className="flex items-start justify-center gap-4">
           <Phone>
             <div className="bg-brand px-4 pb-6 pt-4 text-center text-white">
-              <p className="flex items-center justify-center gap-1 text-[9px] font-semibold">
-                <ShieldIcon className="size-3" /> SKANPROOV
-              </p>
+              <p className="text-[9px] font-bold tracking-wide">SKANPROOV</p>
               <span className="mx-auto mt-4 grid size-12 place-items-center rounded-full bg-white text-brand">
                 <CheckIcon className="size-6" />
               </span>
@@ -55,9 +53,7 @@ export function Verdicts() {
 
           <Phone className="mt-8">
             <div className="bg-danger px-4 pb-6 pt-4 text-center text-white">
-              <p className="flex items-center justify-center gap-1 text-[9px] font-semibold">
-                <ShieldIcon className="size-3" /> SKANPROOV
-              </p>
+              <p className="text-[9px] font-bold tracking-wide">SKANPROOV</p>
               <span className="mx-auto mt-4 grid size-12 place-items-center rounded-full bg-white text-danger">
                 <CloseIcon className="size-6" />
               </span>
