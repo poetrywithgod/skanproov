@@ -8,14 +8,14 @@ import Link from "next/link";
  */
 export function Logo({ className = "h-9 md:h-10" }: { className?: string }) {
   return (
-    <Link href="/" aria-label="SKANPROOV home" className="inline-flex shrink-0 items-center">
+    <Link href="/" aria-label="SKANPROOV home" className="flex w-fit shrink-0 items-center">
       <Image
         src="/brand/logo.png"
         alt="SKANPROOV"
         width={1200}
         height={416}
         priority
-        sizes="(min-width: 768px) 116px, 104px"
+        sizes="116px"
         className={`${className} w-auto`}
       />
     </Link>

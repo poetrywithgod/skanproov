@@ -13,6 +13,8 @@ const sizes = {
   sm: "h-10 gap-2 rounded-[10px] px-[22px]",
   /** Hero and section buttons: 48px tall */
   lg: "h-12 gap-2 rounded-xl px-6",
+  /** Call-to-action band: 52px tall */
+  xl: "h-[52px] gap-[9px] rounded-xl px-[27px]",
 } as const;
 
 type Props = Omit<ComponentProps<typeof Link>, "className"> & {

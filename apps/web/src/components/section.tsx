@@ -11,7 +11,7 @@ type Props = {
 const tones = {
   white: "bg-white text-ink",
   tint: "bg-tint text-ink",
-  dark: "bg-ink text-white",
+  dark: "bg-night text-white",
   brand: "bg-brand text-white",
 } as const;
 

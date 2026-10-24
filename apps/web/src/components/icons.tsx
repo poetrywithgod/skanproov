@@ -46,9 +46,9 @@ export function CloseIcon(props: IconProps) {
 
 export function PinIcon(props: IconProps) {
   return (
-    <svg {...base} {...props}>
-      <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z" />
-      <circle cx="12" cy="10" r="2.5" />
+    <svg {...base} fill="currentColor" strokeWidth={1.5} {...props}>
+      <path d="M12 22s7.5-6.6 7.5-12.5a7.5 7.5 0 1 0-15 0C4.5 15.4 12 22 12 22Z" />
+      <circle cx="12" cy="9.5" r="2.6" fill="#fff" stroke="none" />
     </svg>
   );
 }

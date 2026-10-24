@@ -7,6 +7,7 @@
   --color-brand: #0a7a4a;
   --color-brand-dark: #086a40;
   --color-ink: #0f1f17;
+  --color-night: #0f1b14;
   --color-body: #3d4a43;
   --color-muted: #6b766f;
   --color-tint: #eaefea;
@@ -20,6 +21,10 @@
   --color-label: #515d56;
   --color-danger: #b42318;
   --color-danger-soft: #fdecea;
+  --color-warn: #b54708;
+  --color-warn-soft: #fef3e2;
+  --color-box-line: #e9ebe7;
+  --color-row-line: #f0f2ef;
 }
 
 html {
