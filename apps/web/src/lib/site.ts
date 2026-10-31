@@ -7,11 +7,16 @@ export const site = {
   tagline: "Product authentication for Nigerians",
   url: "https://skanproov.com", // TODO confirm production domain
   links: {
-    scan: "/scan", // TODO browser scan flow
+    scan: "/scan",
+    verify: "/verify", // result screen: /verify/<code>
     getStarted: "/get-started", // TODO
     login: "/login",
     register: "/register",
-    account: "/account", // placeholder until the customer screens are built
+    home: "/home",
+    history: "/history", // TODO real screen
+    notifications: "/notifications", // TODO real screen
+    profile: "/profile",
+    report: "/report", // TODO report-a-fake flow
     forgotPassword: "/forgot-password", // TODO
     demo: "/demo", // TODO demo request form
   },

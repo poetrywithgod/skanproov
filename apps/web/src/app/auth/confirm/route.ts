@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     try {
       const supabase = await createClient();
       const { error } = await supabase.auth.verifyOtp({ type: type as EmailOtpType, token_hash: tokenHash });
-      if (!error) return NextResponse.redirect(new URL(site.links.account, origin));
+      if (!error) return NextResponse.redirect(new URL(site.links.home, origin));
     } catch {
       // Fall through to the failure redirect below.
     }

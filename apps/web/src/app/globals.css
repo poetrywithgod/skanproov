@@ -63,3 +63,24 @@ body {
     letter-spacing: -0.035em;
   }
 }
+
+/* Scan screen: the line sweeping through the viewfinder. */
+@keyframes scan-sweep {
+  0%,
+  100% {
+    transform: translateY(-80px);
+  }
+  50% {
+    transform: translateY(80px);
+  }
+}
+
+.scan-line {
+  animation: scan-sweep 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-line {
+    animation: none;
+  }
+}

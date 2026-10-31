@@ -54,7 +54,7 @@ export function RegisterForm() {
       } else if (result.next === "confirm-email") {
         setConfirmEmail(parsed.data.email);
       } else {
-        router.replace(site.links.account);
+        router.replace(site.links.home);
         router.refresh();
       }
     } catch {

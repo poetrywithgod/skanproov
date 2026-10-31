@@ -42,7 +42,7 @@ export function LoginForm({ initialError }: { initialError?: string }) {
       if (!result.ok) {
         setFormError(result.message);
       } else {
-        router.replace(site.links.account);
+        router.replace(site.links.home);
         router.refresh();
       }
     } catch {

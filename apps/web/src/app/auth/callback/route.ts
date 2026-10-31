@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(site.links.account, origin));
+    if (!error) return NextResponse.redirect(new URL(site.links.home, origin));
   }
 
   return NextResponse.redirect(new URL(`${site.links.login}?error=confirmation`, origin));
