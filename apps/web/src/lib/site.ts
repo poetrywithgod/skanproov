@@ -9,7 +9,9 @@ export const site = {
   links: {
     scan: "/scan", // TODO browser scan flow
     getStarted: "/get-started", // TODO
-    login: "/login", // TODO shared auth entry
+    login: "/login",
+    register: "/register",
+    forgotPassword: "/forgot-password", // TODO
     demo: "/demo", // TODO demo request form
   },
   nav: [

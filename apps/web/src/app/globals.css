@@ -25,6 +25,14 @@
   --color-warn-soft: #fef3e2;
   --color-box-line: #e9ebe7;
   --color-row-line: #f0f2ef;
+
+  /* Auth screens (login / create account), measured from the login designs. */
+  --color-brand-900: #0d3b2a;
+  --color-ink-title: #3a4540;
+  --color-ink-muted: #8f9496;
+  --color-field-border: #d0d5dd;
+  --color-field-placeholder: #a3a8ae;
+  --color-surface-soft: #fafafa;
 }
 
 html {
