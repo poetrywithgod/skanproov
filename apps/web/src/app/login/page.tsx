@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <LoginForm
         initialError={
           error === "confirmation"
-            ? "That confirmation link is invalid or has expired. Sign in, or create your account again."
+            ? "We couldn't sign you in from that link. If you've already confirmed your e-mail, just sign in below. If the link has expired, create your account again."
             : undefined
         }
       />
