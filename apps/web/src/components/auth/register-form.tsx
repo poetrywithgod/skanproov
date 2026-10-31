@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { registerSchema } from "@skanproov/validation";
 import { z } from "zod";
@@ -13,6 +14,8 @@ type FieldName = "fullName" | "email" | "phone" | "password" | "confirmPassword"
 type Errors = Partial<Record<FieldName, string>>;
 
 export function RegisterForm() {
+  const router = useRouter();
+  const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -46,12 +49,37 @@ export function RegisterForm() {
     setPending(true);
     try {
       const result = await signUp(parsed.data);
-      if (!result.ok) setFormError(result.message);
+      if (!result.ok) {
+        setFormError(result.message);
+      } else if (result.next === "confirm-email") {
+        setConfirmEmail(parsed.data.email);
+      } else {
+        router.replace(site.links.account);
+        router.refresh();
+      }
     } catch {
       setFormError("Something went wrong. Please try again.");
     } finally {
       setPending(false);
     }
+  }
+
+  if (confirmEmail) {
+    return (
+      <div className="mt-8 rounded-xl bg-brand-soft px-5 py-6 text-center" role="status">
+        <h2 className="text-lg font-semibold tracking-tight text-brand-900">Check your e-mail</h2>
+        <p className="mt-2 text-sm leading-relaxed text-body">
+          We sent a confirmation link to <span className="font-semibold text-ink">{confirmEmail}</span>.
+          Click it to finish creating your account.
+        </p>
+        <Link
+          href={site.links.login}
+          className="mt-4 inline-block text-sm font-semibold text-brand hover:text-brand-deep hover:underline"
+        >
+          Back to sign in
+        </Link>
+      </div>
+    );
   }
 
   return (

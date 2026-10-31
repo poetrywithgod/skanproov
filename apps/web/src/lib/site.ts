@@ -11,6 +11,7 @@ export const site = {
     getStarted: "/get-started", // TODO
     login: "/login",
     register: "/register",
+    account: "/account", // placeholder until the customer screens are built
     forgotPassword: "/forgot-password", // TODO
     demo: "/demo", // TODO demo request form
   },

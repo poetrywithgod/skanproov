@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { loginSchema } from "@skanproov/validation";
 import { z } from "zod";
@@ -11,9 +12,10 @@ import { ArrowRight, PrimaryButton } from "./primary-button";
 
 type Errors = Partial<Record<"email" | "password", string>>;
 
-export function LoginForm() {
+export function LoginForm({ initialError }: { initialError?: string }) {
+  const router = useRouter();
   const [errors, setErrors] = useState<Errors>({});
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(initialError ?? null);
   const [pending, setPending] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -37,7 +39,12 @@ export function LoginForm() {
     setPending(true);
     try {
       const result = await signIn(parsed.data);
-      if (!result.ok) setFormError(result.message);
+      if (!result.ok) {
+        setFormError(result.message);
+      } else {
+        router.replace(site.links.account);
+        router.refresh();
+      }
     } catch {
       setFormError("Something went wrong. Please try again.");
     } finally {
