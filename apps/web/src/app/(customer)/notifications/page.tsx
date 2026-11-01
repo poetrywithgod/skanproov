@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/app/coming-soon";
+import { NotificationsView } from "@/components/app/notifications-view";
+import { getNotifications } from "@/lib/customer/activity-data";
 import { requireUser } from "@/lib/supabase/user";
 
 export const metadata: Metadata = { title: "Notifications", robots: { index: false } };
 
 export default async function NotificationsPage() {
-  await requireUser();
-  return <ComingSoon title="Notifications" body="Alerts about your scans and rewards will appear here. Coming soon." />;
+  const user = await requireUser();
+  const items = await getNotifications(user.id);
+  return <NotificationsView items={items} />;
 }

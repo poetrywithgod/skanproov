@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/app/coming-soon";
+import { HistoryView } from "@/components/app/history-view";
+import { getHistory } from "@/lib/customer/activity-data";
+import { getHomeData } from "@/lib/customer/home-data";
 import { requireUser } from "@/lib/supabase/user";
 
 export const metadata: Metadata = { title: "History", robots: { index: false } };
 
 export default async function HistoryPage() {
-  await requireUser();
-  return <ComingSoon title="Scan history" body="Every product you scan will be listed here. This screen is coming soon." />;
+  const user = await requireUser();
+  const [entries, home] = await Promise.all([getHistory(user.id), getHomeData(user.id)]);
+  return <HistoryView entries={entries} points={home.points} />;
 }
