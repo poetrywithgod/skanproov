@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Home", robots: { index: false } };
 
 export default async function HomePage() {
   const user = await requireUser();
-  const data = await getHomeData(user.id);
+  const data = await getHomeData();
 
   return <HomeView firstName={user.firstName} verified={user.emailConfirmed} data={data} />;
 }

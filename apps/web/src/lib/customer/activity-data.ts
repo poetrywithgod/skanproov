@@ -1,22 +1,22 @@
-import { demoDataEnabled } from "../demo";
+import { createClient } from "@/lib/supabase/server";
 
-export type ActivityStatus = "authentic" | "duplicate" | "counterfeit";
+export type ActivityStatus = "authentic" | "duplicate" | "not_verified" | "recalled" | "expired";
 
 export interface HistoryEntry {
   id: string;
-  /** Code to open the result screen with. */
+  /** What the person scanned or typed; opens the result screen again. */
   code: string;
   productName: string;
   manufacturer: string | null;
-  /** Batch number or serial, whichever we have. */
+  /** Batch number, or the code itself when we did not recognise it. */
   reference: string;
   status: ActivityStatus;
   /** ISO timestamp. */
   scannedAt: string;
   points: number;
-  pointsState: "credited" | "reported" | "none";
+  pointsState: "credited" | "none";
   nafdac: string | null;
-  /** Short explanation shown on duplicate and failed rows. */
+  /** Short explanation shown on duplicate, recalled, expired and unrecognised rows. */
   note: string | null;
 }
 
@@ -28,145 +28,90 @@ export interface NotificationItem {
   title: string;
   body: string;
   scannedAt: string;
+  unread: boolean;
   /** Result screen to open. */
-  code: string;
+  code: string | null;
 }
 
-const HOUR = 3_600_000;
-const DAY = 24 * HOUR;
-
-function demoHistory(now: Date): HistoryEntry[] {
-  const ago = (ms: number) => new Date(now.getTime() - ms).toISOString();
-  return [
-    {
-      id: "h1",
-      code: "DEMO-GENUINE",
-      productName: "Panadol Extra 500mg",
-      manufacturer: "GSK Consumer Nigeria",
-      reference: "BN-2024-8839",
-      status: "authentic",
-      scannedAt: ago(HOUR),
-      points: 100,
-      pointsState: "credited",
-      nafdac: "A4-0291 (Active)",
-      note: null,
-    },
-    {
-      id: "h2",
-      code: "DEMO-GENUINE",
-      productName: "Nestlé Pure Life 750ml",
-      manufacturer: "Nestlé Waters Ltd",
-      reference: "BN-99321",
-      status: "authentic",
-      scannedAt: ago(DAY + 2 * HOUR),
-      points: 50,
-      pointsState: "credited",
-      nafdac: null,
-      note: null,
-    },
-    {
-      id: "h3",
-      code: "DEMO-DUPLICATE",
-      productName: "Dettol Antiseptic Liquid 250ml",
-      manufacturer: "Reckitt Benckiser",
-      reference: "BN-44109",
-      status: "duplicate",
-      scannedAt: ago(14 * DAY),
-      points: 0,
-      pointsState: "none",
-      nafdac: null,
-      note: "This security hash was scanned previously in Ikeja, Lagos.",
-    },
-    {
-      id: "h4",
-      code: "SKP-000-INVALID",
-      productName: "Aura Vita CBD Elixir 30ml",
-      manufacturer: null,
-      reference: "Serial #SKP-000-INVALID",
-      status: "counterfeit",
-      scannedAt: ago(20 * DAY),
-      points: 0,
-      pointsState: "reported",
-      nafdac: null,
-      note: "Failed Cryptographic Hash Validation",
-    },
-  ];
+interface ScanRow {
+  id: string;
+  code_input: string;
+  result: "genuine" | "duplicate" | "recalled" | "expired" | "not_verified";
+  product_name: string | null;
+  manufacturer_name: string | null;
+  batch_number: string | null;
+  nafdac_number: string | null;
+  note: string | null;
+  points: number;
+  scanned_at: string;
 }
 
-function demoNotifications(now: Date): NotificationItem[] {
-  const ago = (ms: number) => new Date(now.getTime() - ms).toISOString();
-  return [
-    {
-      id: "n1",
-      kind: "verified",
-      title: "Your product has been verified!",
-      body: "Good news! Your scanned product is registered with SKANPROOV and has passed its verification checks.",
-      scannedAt: ago(HOUR),
-      code: "DEMO-GENUINE",
-    },
-    {
-      id: "n2",
-      kind: "unverified",
-      title: "Your product is Unverified!",
-      body: "This product has unusual verification activity. Please review the scan result before proceeding.",
-      scannedAt: ago(2 * HOUR),
-      code: "DEMO-DUPLICATE",
-    },
-    {
-      id: "n3",
-      kind: "recalled",
-      title: "This Product Has Been Recalled",
-      body: "This product has been recalled by the manufacturer. Do not purchase or use it. Follow the recommended next steps.",
-      scannedAt: ago(3 * DAY),
-      code: "DEMO-GENUINE",
-    },
-    {
-      id: "n4",
-      kind: "expired",
-      title: "Expired Product",
-      body: "This product has passed its expiry date. Do not purchase or use it.",
-      scannedAt: ago(5 * DAY),
-      code: "DEMO-GENUINE",
-    },
-  ];
+const SCAN_COLUMNS =
+  "id, code_input, result, product_name, manufacturer_name, batch_number, nafdac_number, note, points, scanned_at";
+
+function toEntry(row: ScanRow): HistoryEntry {
+  const unknown = row.result === "not_verified";
+  return {
+    id: row.id,
+    code: row.code_input,
+    productName: unknown ? "Unrecognised code" : (row.product_name ?? "Product"),
+    manufacturer: row.manufacturer_name,
+    reference: unknown ? `Code ${row.code_input}` : (row.batch_number ?? ""),
+    status: row.result === "genuine" ? "authentic" : row.result,
+    scannedAt: row.scanned_at,
+    points: row.points,
+    pointsState: row.points > 0 ? "credited" : "none",
+    nafdac: row.nafdac_number,
+    note: unknown ? "We couldn't confirm this code. Check where you bought the product." : row.note,
+  };
 }
 
-/**
- * TODO: read from the database once scans and notifications are stored. Until then real accounts
- * see honest empty states and only demo mode shows sample rows.
- */
-export async function getHistory(_userId: string, now: Date = new Date()): Promise<HistoryEntry[]> {
-  return demoDataEnabled ? demoHistory(now) : [];
+/** The signed-in person's scans, newest first. Row level security limits this to their own. */
+export async function getHistory(limit = 100): Promise<HistoryEntry[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("scans")
+    .select(SCAN_COLUMNS)
+    .order("scanned_at", { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.error("Could not load scan history", error.message);
+    return [];
+  }
+  return ((data ?? []) as ScanRow[]).map(toEntry);
 }
 
-export async function getNotifications(_userId: string, now: Date = new Date()): Promise<NotificationItem[]> {
-  return demoDataEnabled ? demoNotifications(now) : [];
+interface NotificationRow {
+  id: string;
+  kind: NotificationKind;
+  title: string;
+  body: string;
+  created_at: string;
+  read_at: string | null;
+  scans: { code_input: string } | { code_input: string }[] | null;
 }
 
-const TIME_ZONE = "Africa/Lagos";
-
-function dayKey(date: Date): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE }).format(date);
-}
-
-export function isToday(iso: string, now: Date = new Date()): boolean {
-  return dayKey(new Date(iso)) === dayKey(now);
-}
-
-/** "Today, 11:20 AM", "Yesterday, 4:15 PM", "May 18, 2:10 PM". */
-export function formatActivityTime(iso: string, now: Date = new Date()): string {
-  const date = new Date(iso);
-  const time = new Intl.DateTimeFormat("en-NG", {
-    timeZone: TIME_ZONE,
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  })
-    .format(date)
-    .replace(/ /g, " ")
-    .toUpperCase();
-  if (dayKey(date) === dayKey(now)) return `Today, ${time}`;
-  if (dayKey(date) === dayKey(new Date(now.getTime() - DAY))) return `Yesterday, ${time}`;
-  const day = new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE, month: "short", day: "numeric" }).format(date);
-  return `${day}, ${time}`;
+export async function getNotifications(limit = 50): Promise<NotificationItem[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("id, kind, title, body, created_at, read_at, scans(code_input)")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.error("Could not load notifications", error.message);
+    return [];
+  }
+  return ((data ?? []) as unknown as NotificationRow[]).map((row) => {
+    const scan = Array.isArray(row.scans) ? row.scans[0] : row.scans;
+    return {
+      id: row.id,
+      kind: row.kind,
+      title: row.title,
+      body: row.body,
+      scannedAt: row.created_at,
+      unread: row.read_at === null,
+      code: scan?.code_input ?? null,
+    };
+  });
 }

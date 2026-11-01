@@ -8,6 +8,8 @@ async function safeUser(): Promise<CurrentUser | null> {
   try {
     return await getCurrentUser();
   } catch (error) {
+    // Next.js uses thrown signals (dynamic rendering, redirects). Those must not be swallowed.
+    if (error && typeof error === "object" && "digest" in error) throw error;
     console.error("Could not load the current user", error);
     return null;
   }

@@ -3,12 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CheckIcon, QrIcon } from "@/components/icons";
-import {
-  formatActivityTime,
-  isToday,
-  type ActivityStatus,
-  type HistoryEntry,
-} from "@/lib/customer/activity-data";
+import type { ActivityStatus, HistoryEntry } from "@/lib/customer/activity-data";
+import { formatActivityTime, isToday } from "@/lib/customer/activity-format";
 import { site } from "@/lib/site";
 import {
   AlertTriangleIcon,
@@ -33,12 +29,14 @@ const FILTERS: { id: Filter; label: string; dot?: string }[] = [
 
 const STATUS_STYLES: Record<ActivityStatus, { border: string; card: string }> = {
   authentic: { border: "border-l-brand", card: "bg-white" },
-  duplicate: { border: "border-l-[#5b6577]", card: "bg-white" },
-  counterfeit: { border: "border-l-danger", card: "bg-danger-soft" },
+  duplicate: { border: "border-l-[#e08a14]", card: "bg-white" },
+  not_verified: { border: "border-l-danger", card: "bg-danger-soft" },
+  recalled: { border: "border-l-[#8b3fe0]", card: "bg-white" },
+  expired: { border: "border-l-[#5b6577]", card: "bg-white" },
 };
 
 function Thumb({ entry }: { entry: HistoryEntry }) {
-  if (entry.status === "counterfeit") {
+  if (entry.status === "not_verified") {
     return (
       <span className="grid size-[50px] shrink-0 place-items-center rounded-lg bg-[#f6d5d2] text-danger">
         <ShieldXIcon className="size-6" />
@@ -57,34 +55,31 @@ function Thumb({ entry }: { entry: HistoryEntry }) {
   );
 }
 
+const CHIPS: Record<ActivityStatus, { label: string; className: string }> = {
+  authentic: { label: "Authentic", className: "bg-brand text-white" },
+  duplicate: { label: "Duplicate", className: "bg-[#fdebd0] text-[#9a5b06]" },
+  not_verified: { label: "Not verified", className: "bg-danger text-white" },
+  recalled: { label: "Recalled", className: "bg-[#ecdcfb] text-[#6b2bb5]" },
+  expired: { label: "Expired", className: "bg-[#dfe5f2] text-[#3d4a63]" },
+};
+
 function StatusChip({ status }: { status: ActivityStatus }) {
-  if (status === "authentic") {
-    return (
-      <span className="inline-flex h-[22px] items-center gap-1 rounded-full bg-brand px-2 text-xs font-semibold text-white">
-        <CheckIcon className="size-3" strokeWidth={3} />
-        Authentic
-      </span>
-    );
-  }
-  if (status === "duplicate") {
-    return (
-      <span className="inline-flex h-[22px] items-center gap-1 rounded-full bg-[#dfe5f2] px-2 text-xs font-semibold text-[#3d4a63]">
-        <AlertTriangleIcon className="size-3" strokeWidth={2.4} />
-        Duplicate
-      </span>
-    );
-  }
+  const chip = CHIPS[status];
   return (
-    <span className="inline-flex h-[22px] items-center gap-1 rounded-full bg-danger px-2 text-xs font-semibold text-white">
-      <AlertTriangleIcon className="size-3" strokeWidth={2.4} />
-      Counterfeit
+    <span className={`inline-flex h-[22px] items-center gap-1 rounded-full px-2 text-xs font-semibold ${chip.className}`}>
+      {status === "authentic" ? (
+        <CheckIcon className="size-3" strokeWidth={3} />
+      ) : (
+        <AlertTriangleIcon className="size-3" strokeWidth={2.4} />
+      )}
+      {chip.label}
     </span>
   );
 }
 
 function ScanCard({ entry, now }: { entry: HistoryEntry; now: Date }) {
   const style = STATUS_STYLES[entry.status];
-  const bad = entry.status === "counterfeit";
+  const bad = entry.status === "not_verified";
   return (
     <li className={`overflow-hidden rounded-2xl border-l-4 p-3.5 shadow-[0_1px_3px_rgba(15,31,23,0.07)] ${style.border} ${style.card}`}>
       <div className="flex gap-3">
@@ -99,7 +94,7 @@ function ScanCard({ entry, now }: { entry: HistoryEntry; now: Date }) {
                   entry.status === "authentic" ? "text-brand" : bad ? "text-danger" : "text-body"
                 }`}
               >
-                {entry.pointsState === "reported" ? "Reported" : `${entry.points > 0 ? "+" : ""}${entry.points} PTS`}
+                {`${entry.points > 0 ? "+" : ""}${entry.points} PTS`}
               </p>
             </div>
           </div>
@@ -129,20 +124,19 @@ function ScanCard({ entry, now }: { entry: HistoryEntry; now: Date }) {
         </div>
       ) : null}
 
-      {entry.status === "duplicate" && entry.note ? (
-        <p className="mt-3 flex items-center gap-2 rounded-lg bg-[#e8eefb] px-3 py-2.5 text-xs text-[#3d4a63]">
+      {entry.status !== "authentic" && entry.note ? (
+        <p className="mt-3 flex items-center gap-2 rounded-lg bg-[#eef1f6] px-3 py-2.5 text-xs text-[#3d4a63]">
           <InfoIcon className="size-4 shrink-0" />
-          {entry.note}
+          <span className="min-w-0 flex-1">{entry.note}</span>
+          {entry.status !== "not_verified" ? (
+            <Link
+              href={`${site.links.verify}/${encodeURIComponent(entry.code)}`}
+              className="shrink-0 font-semibold text-ink underline"
+            >
+              View
+            </Link>
+          ) : null}
         </p>
-      ) : null}
-
-      {bad ? (
-        <div className="mt-3 flex items-center justify-between text-xs">
-          <span className="text-danger">{entry.note}</span>
-          <Link href={site.links.notifications} className="font-semibold text-danger underline">
-            View Notice
-          </Link>
-        </div>
       ) : null}
     </li>
   );

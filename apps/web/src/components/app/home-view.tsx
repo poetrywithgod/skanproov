@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CheckIcon, QrIcon } from "@/components/icons";
-import { formatScanTime, type HomeData, type ScanEntry } from "@/lib/customer/home-data";
+import { formatActivityTime } from "@/lib/customer/activity-format";
+import type { HistoryEntry } from "@/lib/customer/activity-data";
+import type { HomeData } from "@/lib/customer/home-data";
 import { site } from "@/lib/site";
 import {
   AlertTriangleIcon,
@@ -41,7 +43,7 @@ function ScanGlyph() {
   );
 }
 
-function ScanRow({ scan, now }: { scan: ScanEntry; now: Date }) {
+function ScanRow({ scan, now }: { scan: HistoryEntry; now: Date }) {
   const bad = scan.status !== "authentic";
   return (
     <li
@@ -67,10 +69,10 @@ function ScanRow({ scan, now }: { scan: ScanEntry; now: Date }) {
           ) : (
             <span className="inline-flex h-[22px] items-center gap-1 rounded-full bg-danger px-2 text-xs font-semibold text-white">
               <AlertTriangleIcon className="size-3" strokeWidth={2.6} />
-              {scan.status === "duplicate" ? "Duplicate Code" : "Not verified"}
+              {{ duplicate: "Duplicate Code", not_verified: "Not verified", recalled: "Recalled", expired: "Expired" }[scan.status as "duplicate" | "not_verified" | "recalled" | "expired"]}
             </span>
           )}
-          <span className={`text-xs ${bad ? "text-danger" : "text-muted"}`}>{formatScanTime(scan.scannedAt, now)}</span>
+          <span className={`text-xs ${bad ? "text-danger" : "text-muted"}`}>{formatActivityTime(scan.scannedAt, now)}</span>
         </p>
       </div>
 
@@ -79,7 +81,7 @@ function ScanRow({ scan, now }: { scan: ScanEntry; now: Date }) {
           {scan.points > 0 ? `+${scan.points}` : scan.points} pts
         </p>
         <p className={`text-xs ${bad ? "text-danger" : "text-muted"}`}>
-          {scan.pointsState === "credited" ? "Credited" : scan.pointsState === "reported" ? "Reported" : "—"}
+          {scan.pointsState === "credited" ? "Credited" : "—"}
         </p>
       </div>
     </li>

@@ -1,10 +1,6 @@
 import Link from "next/link";
-import {
-  formatActivityTime,
-  isToday,
-  type NotificationItem,
-  type NotificationKind,
-} from "@/lib/customer/activity-data";
+import type { NotificationItem, NotificationKind } from "@/lib/customer/activity-data";
+import { formatActivityTime, isToday } from "@/lib/customer/activity-format";
 import { site } from "@/lib/site";
 
 const KIND: Record<NotificationKind, { border: string; title: string }> = {
@@ -19,7 +15,7 @@ function Item({ item, now }: { item: NotificationItem; now: Date }) {
   return (
     <li>
       <Link
-        href={`${site.links.verify}/${encodeURIComponent(item.code)}`}
+        href={item.code ? `${site.links.verify}/${encodeURIComponent(item.code)}` : site.links.history}
         className={`block rounded-2xl border-l-4 bg-white p-3.5 shadow-[0_1px_3px_rgba(15,31,23,0.07)] focus-visible:outline-2 focus-visible:outline-brand ${kind.border}`}
       >
         <div className="flex items-start justify-between gap-3">

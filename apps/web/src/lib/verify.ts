@@ -1,5 +1,5 @@
 import { extractCode } from "./code";
-import { demoDataEnabled } from "./demo";
+import { createClient } from "./supabase/server";
 
 export interface ProductDetails {
   name: string;
@@ -13,39 +13,67 @@ export interface ProductDetails {
 }
 
 export type VerifyResult =
-  | { status: "genuine"; product: ProductDetails }
+  | { status: "genuine"; product: ProductDetails; points: number }
+  /** Scanned before by someone else. */
+  | { status: "duplicate"; product: ProductDetails }
+  | { status: "recalled"; product: ProductDetails }
+  | { status: "expired"; product: ProductDetails }
   /** We looked and could not confirm it. Never means "fake" on its own; the screen says what to do. */
   | { status: "not_verified" }
   /** The check itself could not run. Never shown as genuine or as a verdict. */
   | { status: "unavailable" };
 
-// Sample products for the demo only. Test values, matching the design.
-const DEMO_PRODUCTS: Record<string, ProductDetails> = {
-  "123456789012": {
-    name: "Indomie Instant Noodles",
-    variant: "Chicken Flavour",
-    manufacturer: "Dufil Prima Foods Ltd.",
-    batchNumber: "IND-TEST-261001",
-    nafdacNumber: "NAFDAC/TEST/000001",
-    manufacturedOn: "2026-10-01",
-    expiresOn: "2027-10-01",
-  },
-};
-DEMO_PRODUCTS["DEMO-GENUINE"] = DEMO_PRODUCTS["123456789012"]!;
+interface RpcProduct {
+  name: string;
+  variant: string | null;
+  manufacturer: string;
+  batch_number: string;
+  nafdac_number: string | null;
+  manufactured_on: string;
+  expires_on: string | null;
+}
+
+interface RpcResult {
+  status: "genuine" | "duplicate" | "recalled" | "expired" | "not_verified";
+  product?: RpcProduct;
+  points?: number;
+}
 
 /**
- * Checks a scanned or typed code.
- *
- * TODO: replace with the real check (signed codes, batch status, clone detection,
- * recall/revoke) once @skanproov/core and the database tables exist. Until then the
- * only way to get "genuine" is a demo code in demo mode.
+ * Checks a scanned or typed code with the database (public.verify_product). When the person is
+ * signed in, this also records the scan, awards points and writes a notification.
  */
 export async function verifyCode(raw: string): Promise<VerifyResult> {
   const code = extractCode(raw);
   if (!code) return { status: "not_verified" };
 
-  if (!demoDataEnabled) return { status: "unavailable" };
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("verify_product", { p_code: code });
+    if (error || !data) {
+      console.error("Verification failed", error?.message);
+      return { status: "unavailable" };
+    }
 
-  const product = DEMO_PRODUCTS[code.toUpperCase()];
-  return product ? { status: "genuine", product } : { status: "not_verified" };
+    const result = data as RpcResult;
+    if (result.status === "not_verified" || !result.product) return { status: "not_verified" };
+
+    const product: ProductDetails = {
+      name: result.product.name,
+      variant: result.product.variant,
+      manufacturer: result.product.manufacturer,
+      batchNumber: result.product.batch_number,
+      nafdacNumber: result.product.nafdac_number,
+      manufacturedOn: result.product.manufactured_on,
+      expiresOn: result.product.expires_on,
+    };
+    return result.status === "genuine"
+      ? { status: "genuine", product, points: result.points ?? 0 }
+      : { status: result.status, product };
+  } catch (error) {
+    // Dynamic-rendering signals must reach Next.js; anything else means the check could not run.
+    if (error && typeof error === "object" && "digest" in error) throw error;
+    console.error("Verification failed", error);
+    return { status: "unavailable" };
+  }
 }

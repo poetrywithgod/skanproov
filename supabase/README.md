@@ -2,7 +2,16 @@
 
 ## Migrations
 
-Run the files in `migrations/` in order in the Supabase SQL Editor (or with the Supabase CLI later).
+Run the files in `migrations/` in order in the Supabase SQL Editor (or with the Supabase CLI later):
+
+1. `20261031120000_profiles.sql`: people and their profiles.
+2. `20261101200000_verification.sql`: manufacturers, products, batches, codes, scans, points, notifications and the `verify_product` check.
+
+### Test data (development projects only)
+
+`seed.sql` adds a made-up manufacturer, product and sample codes so the scanner has something real to
+verify. Run it once, never in production. Codes to try: backup PIN `123456789012`, QR payload
+`DEMO-GENUINE` (more: `DEMO-GENUINE-2` to `-5`, `DEMO-RECALLED`, `DEMO-EXPIRED`, `DEMO-UNRELEASED`).
 
 ## Auth settings (Authentication in the dashboard)
 
