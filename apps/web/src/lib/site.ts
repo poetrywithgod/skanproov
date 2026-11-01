@@ -16,6 +16,7 @@ export const site = {
     history: "/history", // TODO real screen
     notifications: "/notifications", // TODO real screen
     profile: "/profile",
+    editProfile: "/profile/edit",
     report: "/report", // TODO report-a-fake flow
     forgotPassword: "/forgot-password", // TODO
     demo: "/demo", // TODO demo request form

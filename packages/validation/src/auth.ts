@@ -37,13 +37,11 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.input<typeof loginSchema>;
 
+const fullName = z.string().trim().min(2, "Enter your full name").max(120, "Name is too long");
+
 export const registerSchema = z
   .object({
-    fullName: z
-      .string()
-      .trim()
-      .min(2, "Enter your full name")
-      .max(120, "Name is too long"),
+    fullName,
     email,
     phone,
     password: z
@@ -58,3 +56,8 @@ export const registerSchema = z
   });
 export type RegisterInput = z.input<typeof registerSchema>;
 export type RegisterData = z.output<typeof registerSchema>;
+
+/** What a signed-in person can change about themselves. */
+export const profileSchema = z.object({ fullName, phone });
+export type ProfileInput = z.input<typeof profileSchema>;
+export type ProfileData = z.output<typeof profileSchema>;

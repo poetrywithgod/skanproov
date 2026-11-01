@@ -80,11 +80,13 @@ function LinkRow({
 
 export function ProfileView({
   user,
+  saved = false,
   totalScans,
   points,
   blocked,
 }: {
   user: CurrentUser;
+  saved?: boolean;
   totalScans: number;
   points: number;
   blocked: number;
@@ -97,6 +99,11 @@ export function ProfileView({
 
   return (
     <div className="space-y-4 px-3 pb-4 pt-3">
+      {saved ? (
+        <p role="status" className="rounded-xl bg-brand-soft px-4 py-3 text-sm font-semibold text-brand-deep">
+          Your details have been saved.
+        </p>
+      ) : null}
       <section className="rounded-2xl bg-white p-4 shadow-[0_1px_4px_rgba(15,31,23,0.06)]">
         <div className="flex items-center gap-3">
           <span
@@ -126,9 +133,13 @@ export function ProfileView({
           ))}
         </dl>
 
-        <p className="mt-3 flex items-center justify-end gap-2 text-[13px] text-body">
-          Edit Personal Details <Soon />
-        </p>
+        <Link
+          href={site.links.editProfile}
+          className="mt-3 flex items-center justify-end gap-0.5 text-[13px] font-bold text-brand hover:text-brand-deep"
+        >
+          Edit Personal Details
+          <ChevronRightIcon className="size-4" strokeWidth={2.4} />
+        </Link>
       </section>
 
       <Card icon={<LockIcon className="size-5" />} title="Sign-in & Security">

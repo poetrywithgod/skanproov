@@ -6,12 +6,14 @@ import { requireUser } from "@/lib/supabase/user";
 
 export const metadata: Metadata = { title: "Profile", robots: { index: false } };
 
-export default async function ProfilePage() {
+export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const { saved } = await searchParams;
   const user = await requireUser();
   const [history, points] = await Promise.all([getHistory(), getPoints()]);
   return (
     <ProfileView
       user={user}
+      saved={saved === "1"}
       totalScans={history.length}
       points={points}
       blocked={history.filter((h) => h.status !== "authentic").length}
