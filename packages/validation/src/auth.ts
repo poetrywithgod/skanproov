@@ -115,3 +115,12 @@ export const reportSchema = z
   });
 export type ReportInput = z.input<typeof reportSchema>;
 export type ReportData = z.output<typeof reportSchema>;
+
+export const deleteAccountSchema = z.object({
+  password: z.string().min(1, "Enter your password"),
+  confirmation: z
+    .string()
+    .trim()
+    .refine((value) => value.toUpperCase() === "DELETE", { message: "Type DELETE to confirm" }),
+});
+export type DeleteAccountInput = z.input<typeof deleteAccountSchema>;

@@ -197,14 +197,16 @@ export function ProfileView({
           Danger Zone
         </h2>
         <p className="mt-3 text-[13px] leading-[1.5] text-body">
-          Permanently removes your scan history, verified badges, and forfeits your unredeemed{" "}
+          Permanently removes your scan history and notifications, and forfeits your unredeemed{" "}
           {points.toLocaleString("en-NG")} points balance.
         </p>
-        <p className="mt-3 flex items-center gap-2 text-[13px] font-semibold text-danger">
+        <Link
+          href={site.links.deleteAccount}
+          className="mt-3 inline-flex items-center gap-2 text-[13px] font-semibold text-danger underline"
+        >
           <TrashIcon className="size-4" />
           Request Account Deletion
-          <Soon />
-        </p>
+        </Link>
       </section>
     </div>
   );

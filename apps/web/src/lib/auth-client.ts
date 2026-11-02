@@ -122,3 +122,18 @@ export async function changePassword(email: string, currentPassword: string, pas
   const { error } = await supabase.auth.updateUser({ password });
   return error ? { ok: false, message: passwordError(error.code) } : { ok: true };
 }
+
+/** Permanently deletes the signed-in person's account after re-checking their password. */
+export async function deleteAccount(email: string, password: string): Promise<SimpleResult> {
+  const supabase = createClient();
+  const check = await supabase.auth.signInWithPassword({ email, password });
+  if (check.error) {
+    return check.error.code === "invalid_credentials"
+      ? { ok: false, message: "That password isn't right. Please try again." }
+      : { ok: false, message: GENERIC_ERROR };
+  }
+  const { error } = await supabase.rpc("delete_my_account");
+  if (error) return { ok: false, message: "We couldn't delete your account. Please try again." };
+  await supabase.auth.signOut();
+  return { ok: true };
+}

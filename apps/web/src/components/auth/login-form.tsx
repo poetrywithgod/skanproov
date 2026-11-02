@@ -12,7 +12,7 @@ import { ArrowRight, PrimaryButton } from "./primary-button";
 
 type Errors = Partial<Record<"email" | "password", string>>;
 
-export function LoginForm({ initialError }: { initialError?: string }) {
+export function LoginForm({ initialError, notice }: { initialError?: string; notice?: string | undefined }) {
   const router = useRouter();
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState<string | null>(initialError ?? null);
@@ -93,6 +93,11 @@ export function LoginForm({ initialError }: { initialError?: string }) {
           </div>
         </div>
 
+        {notice ? (
+          <p role="status" className="rounded-lg bg-brand-soft px-3.5 py-2.5 text-sm text-brand-deep">
+            {notice}
+          </p>
+        ) : null}
         {formError ? (
           <p role="alert" className="rounded-lg bg-danger-soft px-3.5 py-2.5 text-sm text-danger">
             {formError}

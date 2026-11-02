@@ -4,12 +4,13 @@ import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; deleted?: string }> }) {
+  const { error, deleted } = await searchParams;
 
   return (
     <AuthShell tone="white">
       <LoginForm
+        notice={deleted === "1" ? "Your account has been deleted." : undefined}
         initialError={
           error === "confirmation"
             ? "We couldn't sign you in from that link. If you've already confirmed your e-mail, just sign in below. If the link has expired, create your account again."

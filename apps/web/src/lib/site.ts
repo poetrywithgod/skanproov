@@ -19,6 +19,7 @@ export const site = {
     editProfile: "/profile/edit",
     changePassword: "/profile/password",
     help: "/help",
+    deleteAccount: "/profile/delete",
     resetPassword: "/reset-password",
     report: "/report", // TODO report-a-fake flow
     forgotPassword: "/forgot-password", // TODO
