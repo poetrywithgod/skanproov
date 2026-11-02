@@ -18,6 +18,7 @@ export const site = {
     profile: "/profile",
     editProfile: "/profile/edit",
     changePassword: "/profile/password",
+    help: "/help",
     resetPassword: "/reset-password",
     report: "/report", // TODO report-a-fake flow
     forgotPassword: "/forgot-password", // TODO

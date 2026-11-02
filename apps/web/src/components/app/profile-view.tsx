@@ -168,7 +168,12 @@ export function ProfileView({
           title="Report Fake Batch / Merchant"
           hint="Confidential regulatory whistleblower dispatch"
         />
-        <SoonRow title="Help Center & Verification FAQs" hint="Answers to common questions" />
+        <LinkRow
+          href={site.links.help}
+          icon={<LifebuoyIcon className="size-5" />}
+          title="Help Center & Verification FAQs"
+          hint="Answers to common questions"
+        />
         <div className="flex items-center gap-3 py-3.5 last:pb-1">
           <PhoneIcon className="size-5 text-brand" />
           <p className="min-w-0 flex-1 text-[15px] font-medium text-ink">24/7 Rapid Response Desk</p>
