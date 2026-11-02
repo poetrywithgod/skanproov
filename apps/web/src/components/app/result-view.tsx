@@ -5,6 +5,7 @@ import type { ProductDetails, VerifyResult } from "@/lib/verify";
 import { site } from "@/lib/site";
 import { AlertTriangleIcon, ChevronRightIcon } from "./app-icons";
 import { CopyButton } from "./copy-button";
+import { LocationTagger } from "./location-tagger";
 import { SponsoredBanner } from "./sponsored-banner";
 
 function formatDate(iso: string) {
@@ -90,18 +91,21 @@ export function ResultView({
   result,
   ads,
   signedIn = false,
+  geotag = false,
   now = new Date(),
 }: {
   code: string;
   result: VerifyResult;
   ads: Ad[];
   signedIn?: boolean;
+  geotag?: boolean;
   now?: Date;
 }) {
   const reportHref = `${site.links.report}?code=${encodeURIComponent(code)}`;
 
   return (
     <div className="pb-4">
+      {geotag && result.status !== "unavailable" ? <LocationTagger code={code} /> : null}
       <SponsoredBanner ads={ads} />
 
       <div className="space-y-4 px-3 pt-4">

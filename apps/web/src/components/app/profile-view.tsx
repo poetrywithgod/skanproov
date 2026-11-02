@@ -159,9 +159,11 @@ export function ProfileView({
       </Card>
 
       <Card icon={<TargetIcon className="size-5" />} title="Location & Geotagging">
-        <SoonRow
+        <LinkRow
+          href={site.links.location}
+          icon={<TargetIcon className="size-5" />}
           title="GPS Scan Geotagging"
-          hint="Tie each scan to where it happened, to help spot cloned codes."
+          hint={user.geotagScans ? "On: scans include your approximate location" : "Off: tap to learn more and turn on"}
         />
         <SoonRow title="Counterfeit Cluster Proximity" hint="Get notified when entering reported high-risk markets" />
       </Card>

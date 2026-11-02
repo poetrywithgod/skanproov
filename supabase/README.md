@@ -9,6 +9,7 @@ Run the files in `migrations/` in order in the Supabase SQL Editor (or with the 
 3. `20261102060000_reports.sql`: shopper reports ("report an issue") and the `submit_report` function.
 4. `20261102070000_account_deletion.sql`: `delete_my_account` and a fix so deleting an account cannot free up its codes.
 5. `20261102080000_mfa.sql`: makes two-factor sign-in enforceable at the database, not just in the app.
+6. `20261102090000_geotagging.sql`: the optional "GPS scan geotagging" setting and `attach_scan_location`.
 
 ### Test data (development projects only)
 

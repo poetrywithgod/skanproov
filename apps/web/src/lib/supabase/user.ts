@@ -12,6 +12,8 @@ export interface CurrentUser {
   phone: string | null;
   /** A verified authenticator app is set up, so sign-in asks for a code. */
   twoFactorOn: boolean;
+  /** Opted in to attaching the device's location to scans. */
+  geotagScans: boolean;
 }
 
 /**
@@ -34,7 +36,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, phone")
+    .select("full_name, phone, geotag_scans")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -47,6 +49,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     firstName: fullName?.trim().split(/\s+/)[0] ?? null,
     phone: profile?.phone ?? null,
     twoFactorOn,
+    geotagScans: profile?.geotag_scans ?? false,
   };
 });
 

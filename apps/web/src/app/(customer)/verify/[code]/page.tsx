@@ -11,5 +11,5 @@ export default async function VerifyPage({ params }: { params: Promise<{ code: s
   const { code: raw } = await params;
   const code = decodeURIComponent(raw);
   const [result, ads, user] = await Promise.all([verifyCode(code), getAds("result_top"), getCurrentUser().catch(() => null)]);
-  return <ResultView code={code} result={result} ads={ads} signedIn={Boolean(user)} />;
+  return <ResultView code={code} result={result} ads={ads} signedIn={Boolean(user)} geotag={Boolean(user?.geotagScans)} />;
 }
