@@ -6,6 +6,7 @@ Run the files in `migrations/` in order in the Supabase SQL Editor (or with the 
 
 1. `20261031120000_profiles.sql`: people and their profiles.
 2. `20261101200000_verification.sql`: manufacturers, products, batches, codes, scans, points, notifications and the `verify_product` check.
+3. `20261102060000_reports.sql`: shopper reports ("report an issue") and the `submit_report` function.
 
 ### Test data (development projects only)
 

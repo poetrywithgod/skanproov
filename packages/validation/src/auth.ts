@@ -93,3 +93,25 @@ export const changePasswordSchema = z
     message: "Choose a password different from your current one",
   });
 export type ChangePasswordInput = z.input<typeof changePasswordSchema>;
+
+export const REPORT_KINDS = [
+  { value: "suspected_fake", label: "I think it's fake" },
+  { value: "tampered_seal", label: "The seal looks tampered with" },
+  { value: "wrong_details", label: "The details don't match the product" },
+  { value: "expired_on_sale", label: "It's expired but still on sale" },
+  { value: "other", label: "Something else" },
+] as const;
+
+export const reportSchema = z
+  .object({
+    kind: z.enum(REPORT_KINDS.map((k) => k.value) as [string, ...string[]], { error: "Choose what's wrong" }),
+    code: z.string().trim().max(64, "That code is too long"),
+    place: z.string().trim().max(200, "Keep this under 200 characters"),
+    details: z.string().trim().max(1000, "Keep this under 1,000 characters"),
+  })
+  .refine((data) => data.code !== "" || data.place !== "" || data.details !== "", {
+    path: ["details"],
+    message: "Tell us a little: the code, where you bought it, or what you noticed",
+  });
+export type ReportInput = z.input<typeof reportSchema>;
+export type ReportData = z.output<typeof reportSchema>;
