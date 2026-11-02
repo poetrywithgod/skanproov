@@ -19,6 +19,7 @@ export const site = {
     editProfile: "/profile/edit",
     changePassword: "/profile/password",
     help: "/help",
+    appLock: "/profile/app-lock",
     location: "/profile/location",
     twoFactor: "/profile/two-factor",
     deleteAccount: "/profile/delete",

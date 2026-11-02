@@ -143,7 +143,12 @@ export function ProfileView({
       </section>
 
       <Card icon={<LockIcon className="size-5" />} title="Sign-in & Security">
-        <SoonRow title="Biometric App Unlock" hint="Face ID and fingerprint for Quick Verify" />
+        <LinkRow
+          href={site.links.appLock}
+          icon={<LockIcon className="size-5" />}
+          title="Biometric App Unlock"
+          hint="Fingerprint or Face ID to open the app on this phone"
+        />
         <LinkRow
           href={site.links.changePassword}
           icon={<LockIcon className="size-5" />}
@@ -165,7 +170,10 @@ export function ProfileView({
           title="GPS Scan Geotagging"
           hint={user.geotagScans ? "On: scans include your approximate location" : "Off: tap to learn more and turn on"}
         />
-        <SoonRow title="Counterfeit Cluster Proximity" hint="Get notified when entering reported high-risk markets" />
+        <SoonRow
+          title="Counterfeit Cluster Proximity"
+          hint="Alerts when you enter reported high-risk markets. Needs the SKANPROOV mobile app."
+        />
       </Card>
 
       <Card icon={<LifebuoyIcon className="size-5" />} title="Support & Enforcement">

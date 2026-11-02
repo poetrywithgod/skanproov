@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AppHeader } from "@/components/app/app-header";
+import { AppLockGate } from "@/components/app/app-lock-gate";
 import { BottomNav } from "@/components/app/bottom-nav";
 import { getCurrentUser, type CurrentUser } from "@/lib/supabase/user";
 
@@ -23,12 +24,14 @@ export default async function CustomerLayout({ children }: { children: ReactNode
   const user = await safeUser();
 
   return (
-    <div className="min-h-dvh bg-[#eef1ee]">
-      <div className="relative mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-surface-soft sm:shadow-[0_0_0_1px_rgba(15,31,23,0.05),0_8px_32px_rgba(15,31,23,0.08)]">
-        <AppHeader user={user} />
-        <main className="flex-1 pb-32">{children}</main>
-        <BottomNav />
+    <AppLockGate userId={user?.id ?? null}>
+      <div className="min-h-dvh bg-[#eef1ee]">
+        <div className="relative mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-surface-soft sm:shadow-[0_0_0_1px_rgba(15,31,23,0.05),0_8px_32px_rgba(15,31,23,0.08)]">
+          <AppHeader user={user} />
+          <main className="flex-1 pb-32">{children}</main>
+          <BottomNav />
+        </div>
       </div>
-    </div>
+    </AppLockGate>
   );
 }
