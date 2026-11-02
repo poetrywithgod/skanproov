@@ -10,12 +10,15 @@ Run the files in `migrations/` in order in the Supabase SQL Editor (or with the 
 4. `20261102070000_account_deletion.sql`: `delete_my_account` and a fix so deleting an account cannot free up its codes.
 5. `20261102080000_mfa.sql`: makes two-factor sign-in enforceable at the database, not just in the app.
 6. `20261102090000_geotagging.sql`: the optional "GPS scan geotagging" setting and `attach_scan_location`.
+7. `20261103100000_retailer.sql`: retailers, branches, manufacturer connections, cartons and carton scanning.
 
 ### Test data (development projects only)
 
 `seed.sql` adds a made-up manufacturer, product and sample codes so the scanner has something real to
 verify. Run it once, never in production. Codes to try: backup PIN `123456789012`, QR payload
 `DEMO-GENUINE` (more: `DEMO-GENUINE-2` to `-5`, `DEMO-RECALLED`, `DEMO-EXPIRED`, `DEMO-UNRELEASED`).
+
+For the retailer app, also run `seed-retailer.sql` (after `seed.sql`). It adds sample cartons. Until the Super Admin app exists, approve a new branch in the SQL Editor: `update public.retailer_branches set status = 'approved', reviewed_at = now() where status = 'pending';`
 
 ## Auth settings (Authentication in the dashboard)
 

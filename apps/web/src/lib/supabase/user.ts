@@ -14,6 +14,9 @@ export interface CurrentUser {
   twoFactorOn: boolean;
   /** Opted in to attaching the device's location to scans. */
   geotagScans: boolean;
+  accountType: "consumer" | "retailer" | "manufacturer" | "super_admin";
+  /** What the person said they were signing up as. Only a hint for where to send them. */
+  intendedAccount: string | null;
 }
 
 /**
@@ -36,7 +39,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, phone, geotag_scans")
+    .select("full_name, phone, geotag_scans, account_type")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -50,6 +53,9 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     phone: profile?.phone ?? null,
     twoFactorOn,
     geotagScans: profile?.geotag_scans ?? false,
+    accountType: (profile?.account_type as CurrentUser["accountType"] | undefined) ?? "consumer",
+    intendedAccount:
+      typeof user.user_metadata?.intended_account === "string" ? user.user_metadata.intended_account : null,
   };
 });
 

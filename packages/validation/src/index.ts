@@ -5,3 +5,4 @@ export const verdictSchema = z.enum(["genuine", "not_verified"]);
 export type Verdict = z.infer<typeof verdictSchema>;
 
 export * from "./auth";
+export * from "./retailer";

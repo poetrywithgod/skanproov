@@ -33,14 +33,15 @@ export async function signIn(input: LoginInput): Promise<AuthResult> {
   }
 }
 
-export async function signUp(input: RegisterData): Promise<AuthResult> {
+export async function signUp(input: RegisterData, intended?: "retailer"): Promise<AuthResult> {
   const supabase = createClient();
   const { data, error } = await supabase.auth.signUp({
     email: input.email,
     password: input.password,
     options: {
       // Read by the database trigger that creates the profile row.
-      data: { full_name: input.fullName, phone: input.phone },
+      // intended_account is only a hint for where to send them after sign-in; the trigger ignores it.
+      data: { full_name: input.fullName, phone: input.phone, ...(intended ? { intended_account: intended } : {}) },
       emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   });

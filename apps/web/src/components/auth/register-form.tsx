@@ -13,7 +13,7 @@ import { PrimaryButton } from "./primary-button";
 type FieldName = "fullName" | "email" | "phone" | "password" | "confirmPassword";
 type Errors = Partial<Record<FieldName, string>>;
 
-export function RegisterForm() {
+export function RegisterForm({ retailer = false }: { retailer?: boolean }) {
   const router = useRouter();
   const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
@@ -48,13 +48,13 @@ export function RegisterForm() {
     setErrors({});
     setPending(true);
     try {
-      const result = await signUp(parsed.data);
+      const result = await signUp(parsed.data, retailer ? "retailer" : undefined);
       if (!result.ok) {
         setFormError(result.message);
       } else if (result.next === "confirm-email") {
         setConfirmEmail(parsed.data.email);
       } else {
-        router.replace(site.links.home);
+        router.replace(retailer ? site.retailer.register : site.links.home);
         router.refresh();
       }
     } catch {
@@ -143,6 +143,17 @@ export function RegisterForm() {
         <Link href={site.links.login} className="font-semibold text-brand hover:text-brand-deep hover:underline">
           Login
         </Link>
+      </p>
+      <p className="mt-2 text-center text-sm text-body">
+        {retailer ? (
+          <Link href={site.links.register} className="font-semibold text-brand hover:text-brand-deep hover:underline">
+            Not a shop? Create a shopper account
+          </Link>
+        ) : (
+          <Link href={site.retailer.signup} className="font-semibold text-brand hover:text-brand-deep hover:underline">
+            Own a shop? Register as a retailer
+          </Link>
+        )}
       </p>
     </div>
   );

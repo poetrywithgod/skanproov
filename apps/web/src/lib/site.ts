@@ -28,6 +28,16 @@ export const site = {
     forgotPassword: "/forgot-password", // TODO
     demo: "/demo", // TODO demo request form
   },
+  retailer: {
+    signup: "/retailer/signup",
+    register: "/retailer/register",
+    home: "/retailer",
+    scan: "/retailer/scan",
+    result: "/retailer/result", // /retailer/result/<code>
+    manufacturers: "/retailer/manufacturers",
+    history: "/retailer/history",
+    profile: "/retailer/profile",
+  },
   nav: [
     { label: "How it works", href: "#how-it-works" },
     { label: "Who it's for", href: "#who-its-for" },
