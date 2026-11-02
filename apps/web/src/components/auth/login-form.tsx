@@ -2,21 +2,43 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { loginSchema } from "@skanproov/validation";
 import { z } from "zod";
 import { signIn } from "@/lib/auth-client";
+import { needsMfa } from "@/lib/mfa-client";
 import { site } from "@/lib/site";
 import { PasswordField, TextField } from "./fields";
+import { MfaStep } from "./mfa-step";
 import { ArrowRight, PrimaryButton } from "./primary-button";
 
 type Errors = Partial<Record<"email" | "password", string>>;
 
-export function LoginForm({ initialError, notice }: { initialError?: string; notice?: string | undefined }) {
+export function LoginForm({
+  initialError,
+  notice,
+  checkMfaOnLoad = false,
+}: {
+  initialError?: string;
+  notice?: string | undefined;
+  checkMfaOnLoad?: boolean;
+}) {
   const router = useRouter();
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState<string | null>(initialError ?? null);
   const [pending, setPending] = useState(false);
+  const [mfaStep, setMfaStep] = useState(false);
+
+  // Sent back here after a password-only sign-in (for example after a password reset).
+  useEffect(() => {
+    if (!checkMfaOnLoad) return;
+    void needsMfa().then((needed) => setMfaStep(needed));
+  }, [checkMfaOnLoad]);
+
+  function finish() {
+    router.replace(site.links.home);
+    router.refresh();
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,9 +63,10 @@ export function LoginForm({ initialError, notice }: { initialError?: string; not
       const result = await signIn(parsed.data);
       if (!result.ok) {
         setFormError(result.message);
+      } else if (await needsMfa()) {
+        setMfaStep(true);
       } else {
-        router.replace(site.links.home);
-        router.refresh();
+        finish();
       }
     } catch {
       setFormError("Something went wrong. Please try again.");
@@ -51,6 +74,8 @@ export function LoginForm({ initialError, notice }: { initialError?: string; not
       setPending(false);
     }
   }
+
+  if (mfaStep) return <MfaStep onDone={finish} onCancel={() => setMfaStep(false)} />;
 
   return (
     <div className="mt-9">

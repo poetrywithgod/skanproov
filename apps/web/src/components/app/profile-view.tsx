@@ -150,7 +150,12 @@ export function ProfileView({
           title="Change Password"
           hint="Update the password you sign in with"
         />
-        <SoonRow title="Two-Factor Authentication (2FA)" hint="A code sent to your phone at sign-in" />
+        <LinkRow
+          href={site.links.twoFactor}
+          icon={<LockIcon className="size-5" />}
+          title="Two-Factor Authentication (2FA)"
+          hint={user.twoFactorOn ? "On: sign-in asks for a code" : "Off: add a code from an authenticator app"}
+        />
       </Card>
 
       <Card icon={<TargetIcon className="size-5" />} title="Location & Geotagging">

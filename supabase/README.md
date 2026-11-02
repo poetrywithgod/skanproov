@@ -8,6 +8,7 @@ Run the files in `migrations/` in order in the Supabase SQL Editor (or with the 
 2. `20261101200000_verification.sql`: manufacturers, products, batches, codes, scans, points, notifications and the `verify_product` check.
 3. `20261102060000_reports.sql`: shopper reports ("report an issue") and the `submit_report` function.
 4. `20261102070000_account_deletion.sql`: `delete_my_account` and a fix so deleting an account cannot free up its codes.
+5. `20261102080000_mfa.sql`: makes two-factor sign-in enforceable at the database, not just in the app.
 
 ### Test data (development projects only)
 

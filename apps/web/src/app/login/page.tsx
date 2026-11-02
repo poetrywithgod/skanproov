@@ -4,12 +4,13 @@ import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; deleted?: string }> }) {
-  const { error, deleted } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; deleted?: string; mfa?: string }> }) {
+  const { error, deleted, mfa } = await searchParams;
 
   return (
     <AuthShell tone="white">
       <LoginForm
+        checkMfaOnLoad={mfa === "1"}
         notice={deleted === "1" ? "Your account has been deleted." : undefined}
         initialError={
           error === "confirmation"

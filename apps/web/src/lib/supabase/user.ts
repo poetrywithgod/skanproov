@@ -10,6 +10,8 @@ export interface CurrentUser {
   fullName: string | null;
   firstName: string | null;
   phone: string | null;
+  /** A verified authenticator app is set up, so sign-in asks for a code. */
+  twoFactorOn: boolean;
 }
 
 /**
@@ -25,6 +27,11 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
+  // A person with two-factor on who has only typed their password is not fully signed in yet.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const twoFactorOn = aal?.nextLevel === "aal2";
+  if (twoFactorOn && aal?.currentLevel !== "aal2") return null;
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name, phone")
@@ -39,12 +46,13 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     fullName,
     firstName: fullName?.trim().split(/\s+/)[0] ?? null,
     phone: profile?.phone ?? null,
+    twoFactorOn,
   };
 });
 
 /** For screens that need an account. Guests are sent to sign in. */
 export async function requireUser(): Promise<CurrentUser> {
   const user = await getCurrentUser();
-  if (!user) redirect(site.links.login);
+  if (!user) redirect(`${site.links.login}?mfa=1`);
   return user;
 }
