@@ -80,13 +80,13 @@ function LinkRow({
 
 export function ProfileView({
   user,
-  saved = false,
+  saved = null,
   totalScans,
   points,
   blocked,
 }: {
   user: CurrentUser;
-  saved?: boolean;
+  saved?: "details" | "password" | null;
   totalScans: number;
   points: number;
   blocked: number;
@@ -101,7 +101,7 @@ export function ProfileView({
     <div className="space-y-4 px-3 pb-4 pt-3">
       {saved ? (
         <p role="status" className="rounded-xl bg-brand-soft px-4 py-3 text-sm font-semibold text-brand-deep">
-          Your details have been saved.
+          {saved === "password" ? "Your password has been changed." : "Your details have been saved."}
         </p>
       ) : null}
       <section className="rounded-2xl bg-white p-4 shadow-[0_1px_4px_rgba(15,31,23,0.06)]">
@@ -144,7 +144,12 @@ export function ProfileView({
 
       <Card icon={<LockIcon className="size-5" />} title="Sign-in & Security">
         <SoonRow title="Biometric App Unlock" hint="Face ID and fingerprint for Quick Verify" />
-        <SoonRow title="Change Password" hint="Update the password you sign in with" />
+        <LinkRow
+          href={site.links.changePassword}
+          icon={<LockIcon className="size-5" />}
+          title="Change Password"
+          hint="Update the password you sign in with"
+        />
         <SoonRow title="Two-Factor Authentication (2FA)" hint="A code sent to your phone at sign-in" />
       </Card>
 

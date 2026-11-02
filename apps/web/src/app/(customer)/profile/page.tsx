@@ -13,7 +13,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   return (
     <ProfileView
       user={user}
-      saved={saved === "1"}
+      saved={saved === "password" ? "password" : saved === "1" ? "details" : null}
       totalScans={history.length}
       points={points}
       blocked={history.filter((h) => h.status !== "authentic").length}

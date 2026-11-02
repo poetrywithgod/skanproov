@@ -67,3 +67,58 @@ export async function signUp(input: RegisterData): Promise<AuthResult> {
   // With e-mail confirmation on (Supabase default) there is no session until the link is clicked.
   return { ok: true, next: data.session ? "account" : "confirm-email" };
 }
+
+export type SimpleResult = { ok: true } | { ok: false; message: string };
+
+function passwordError(code: string | undefined): string {
+  switch (code) {
+    case "weak_password":
+      return "That password is too easy to guess. Please choose a stronger one.";
+    case "same_password":
+      return "Choose a password different from your current one.";
+    case "over_request_rate_limit":
+    case "over_email_send_rate_limit":
+      return "Too many attempts. Please wait a few minutes and try again.";
+    case "reauthentication_needed":
+    case "session_not_found":
+    case "not_authenticated":
+      return "Your session has ended. Please use the link in your e-mail again, or request a new one.";
+    default:
+      return GENERIC_ERROR;
+  }
+}
+
+/**
+ * Sends the reset link. Always reports success for a well-formed request, so the screen never
+ * reveals which e-mail addresses have an account.
+ */
+export async function requestPasswordReset(email: string): Promise<SimpleResult> {
+  const supabase = createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/auth/reset`,
+  });
+  if (error && (error.code === "over_request_rate_limit" || error.code === "over_email_send_rate_limit")) {
+    return { ok: false, message: passwordError(error.code) };
+  }
+  return { ok: true };
+}
+
+/** Sets a new password for the person the reset link just signed in. */
+export async function resetPassword(password: string): Promise<SimpleResult> {
+  const supabase = createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  return error ? { ok: false, message: passwordError(error.code) } : { ok: true };
+}
+
+/** Changes the password after checking the current one. */
+export async function changePassword(email: string, currentPassword: string, password: string): Promise<SimpleResult> {
+  const supabase = createClient();
+  const check = await supabase.auth.signInWithPassword({ email, password: currentPassword });
+  if (check.error) {
+    return check.error.code === "invalid_credentials"
+      ? { ok: false, message: "Your current password isn't right. Please try again." }
+      : { ok: false, message: passwordError(check.error.code) };
+  }
+  const { error } = await supabase.auth.updateUser({ password });
+  return error ? { ok: false, message: passwordError(error.code) } : { ok: true };
+}

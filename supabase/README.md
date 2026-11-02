@@ -18,7 +18,7 @@ verify. Run it once, never in production. Codes to try: backup PIN `123456789012
 **URL Configuration**
 
 - Site URL: `http://localhost:3000` while developing, the production domain at launch.
-- Redirect URLs: add `http://localhost:3000/auth/callback` (and the production equivalent).
+- Redirect URLs: add `http://localhost:3000/auth/callback` and `http://localhost:3000/auth/reset` (and the production equivalents). The second one is for password reset e-mails.
 
 ## Confirmation e-mail: current behaviour and the planned upgrade
 
@@ -44,3 +44,16 @@ Site URL setting above, so it works in each environment.
 
 Supabase's built-in sender is for testing only and is heavily rate-limited. Set up custom SMTP
 before real users arrive.
+
+## Password reset e-mail
+
+Until custom SMTP is set up, the reset link only works when opened in the same browser that requested
+it (same PKCE limit as sign-up). After SMTP, set the **Reset password** template (Authentication →
+Email Templates) body to:
+
+```html
+<h2>Reset your password</h2>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery">Choose a new password</a></p>
+```
+
+The `/auth/confirm` route already handles `type=recovery`.

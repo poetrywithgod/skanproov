@@ -3,8 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { site } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 
-/** Link types this route will verify. Password recovery gets added when that screen exists. */
-const ALLOWED_TYPES: ReadonlySet<string> = new Set(["email", "signup"]);
+/** Link types this route will verify. */
+const ALLOWED_TYPES: ReadonlySet<string> = new Set(["email", "signup", "recovery"]);
 
 /**
  * Landing point for the link in the confirmation e-mail.
@@ -24,11 +24,15 @@ export async function GET(request: NextRequest) {
     try {
       const supabase = await createClient();
       const { error } = await supabase.auth.verifyOtp({ type: type as EmailOtpType, token_hash: tokenHash });
-      if (!error) return NextResponse.redirect(new URL(site.links.home, origin));
+      if (!error) {
+        const destination = type === "recovery" ? site.links.resetPassword : site.links.home;
+        return NextResponse.redirect(new URL(destination, origin));
+      }
     } catch {
       // Fall through to the failure redirect below.
     }
   }
 
-  return NextResponse.redirect(new URL(`${site.links.login}?error=confirmation`, origin));
+  const failure = type === "recovery" ? `${site.links.forgotPassword}?error=link` : `${site.links.login}?error=confirmation`;
+  return NextResponse.redirect(new URL(failure, origin));
 }

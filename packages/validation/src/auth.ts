@@ -39,6 +39,11 @@ export type LoginInput = z.input<typeof loginSchema>;
 
 const fullName = z.string().trim().min(2, "Enter your full name").max(120, "Name is too long");
 
+const newPassword = z
+  .string()
+  .min(PASSWORD_MIN_LENGTH, `Use at least ${PASSWORD_MIN_LENGTH} characters`)
+  .max(128, "Password is too long");
+
 export const registerSchema = z
   .object({
     fullName,
@@ -61,3 +66,30 @@ export type RegisterData = z.output<typeof registerSchema>;
 export const profileSchema = z.object({ fullName, phone });
 export type ProfileInput = z.input<typeof profileSchema>;
 export type ProfileData = z.output<typeof profileSchema>;
+
+export const forgotPasswordSchema = z.object({ email });
+export type ForgotPasswordInput = z.input<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z
+  .object({ password: newPassword, confirmPassword: z.string().min(1, "Confirm your password") })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
+export type ResetPasswordInput = z.input<typeof resetPasswordSchema>;
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Enter your current password"),
+    password: newPassword,
+    confirmPassword: z.string().min(1, "Confirm your new password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  })
+  .refine((data) => data.password !== data.currentPassword, {
+    path: ["password"],
+    message: "Choose a password different from your current one",
+  });
+export type ChangePasswordInput = z.input<typeof changePasswordSchema>;
