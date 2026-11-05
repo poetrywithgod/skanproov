@@ -33,6 +33,13 @@
   --color-field-border: #d0d5dd;
   --color-field-placeholder: #a3a8ae;
   --color-surface-soft: #fafafa;
+
+  /* Retailer app, measured from the retailer designs. */
+  --color-retail: #0e6b4f;
+  --color-retail-dark: #0b5a42;
+  --color-retail-soft: #e3f1ea;
+  --color-pill: #f3f5f2;
+  --color-track: #e9ecea;
 }
 
 html {

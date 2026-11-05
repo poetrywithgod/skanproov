@@ -11,6 +11,7 @@ Run the files in `migrations/` in order in the Supabase SQL Editor (or with the 
 5. `20261102080000_mfa.sql`: makes two-factor sign-in enforceable at the database, not just in the app.
 6. `20261102090000_geotagging.sql`: the optional "GPS scan geotagging" setting and `attach_scan_location`.
 7. `20261103100000_retailer.sql`: retailers, branches, manufacturer connections, cartons and carton scanning.
+8. `20261105090000_manufacturer_profiles.sql`: manufacturer profile details (registered name, RC number, address, categories, brands, contact) and `get_manufacturer`.
 
 ### Test data (development projects only)
 

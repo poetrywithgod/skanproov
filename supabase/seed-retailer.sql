@@ -34,3 +34,24 @@ join (values
   ('BT-DP-5521',      'CT-DEMO-0006', 'CARTON-DELTA-1')
 ) as v(batch, carton, qr) on v.batch = b.batch_number
 on conflict do nothing;
+
+-- Manufacturer profiles for the Manufacturers screens. Safe to run again: it updates what it inserted.
+insert into public.manufacturers (name, registered_name, rc_number, address, contact_email, categories, brands, verified_at)
+values
+  ('Sunvale Beverages', 'Sunvale Beverages Nigeria Ltd', 'RC 1048823', 'Plot 14, Agbara Industrial Estate, Ogun',
+   'retail@sunvale.ng', '{Beverages,Dairy}', '{"Sunvale Malt","Choco Gold"}', now()),
+  ('Delta Pure Oils', 'Delta Pure Oils Nigeria Ltd', 'RC 774120', '22 Warri-Sapele Road, Warri, Delta',
+   'trade@deltapure.ng', '{"Edible oils","Cooking oils"}', '{"Delta Pure"}', now()),
+  ('Harvest Gold Oils', 'Harvest Gold Processing Co.', 'RC 902311', '5 Trans-Amadi Industrial Layout, Port Harcourt',
+   'trade@harvestgold.ng', '{"Cooking oils"}', '{"Harvest Gold"}', now()),
+  ('Lagoon Confectionery', 'Lagoon Confectionery Ltd', 'RC 655908', '9 Creek Road, Apapa, Lagos',
+   'sales@lagoonconf.ng', '{Snacks,Confectionery}', '{"Lagoon Treats"}', now()),
+  ('Brightway Household', 'Brightway Household Products Ltd', null, null, null, '{"Household goods"}', '{}', null)
+on conflict (name) do update set
+  registered_name = excluded.registered_name, rc_number = excluded.rc_number, address = excluded.address,
+  contact_email = excluded.contact_email, categories = excluded.categories, brands = excluded.brands,
+  verified_at = excluded.verified_at;
+
+update public.manufacturers
+   set registered_name = 'Dufil Prima Foods Plc', categories = '{Noodles,Food}', brands = '{Indomie}'
+ where name = 'Dufil Prima Foods Ltd.' and registered_name is null;

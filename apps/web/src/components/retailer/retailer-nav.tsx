@@ -26,7 +26,7 @@ function TabLink({ tab, pathname }: { tab: Tab; pathname: string }) {
       href={tab.href}
       aria-current={active ? "page" : undefined}
       className={`flex min-h-12 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors ${
-        active ? "text-brand" : "text-[#5b6660] hover:text-ink"
+        active ? "text-retail" : "text-[#5b6660] hover:text-ink"
       }`}
     >
       <tab.Icon className="size-[22px]" />
@@ -54,7 +54,7 @@ export function RetailerNav() {
             href={site.retailer.scan}
             aria-label="Scan a carton"
             aria-current={scanning ? "page" : undefined}
-            className="-mt-7 grid size-[60px] place-items-center rounded-full bg-brand text-white shadow-[0_6px_16px_rgba(10,122,74,0.4)] ring-[5px] ring-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            className="-mt-7 grid size-[60px] place-items-center rounded-full bg-retail text-white shadow-[0_6px_16px_rgba(14,107,79,0.4)] ring-[5px] ring-white transition-colors hover:bg-retail-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail"
           >
             <ScanIcon className="size-7" strokeWidth={2.2} />
           </Link>

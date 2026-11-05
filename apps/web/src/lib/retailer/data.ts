@@ -52,8 +52,39 @@ export const getRetailerContext = cache(async (): Promise<RetailerContext | null
 export interface Manufacturer {
   id: string;
   name: string;
+  categories: string[];
+  /** SKANPROOV has checked the business. Only then may the app say "Business verified". */
+  verified: boolean;
   connected: boolean;
   connectedAt: string | null;
+}
+
+export interface ManufacturerProfile extends Manufacturer {
+  registeredName: string | null;
+  rcNumber: string | null;
+  address: string | null;
+  brands: string[];
+  contactEmail: string | null;
+}
+
+type ManufacturerRow = {
+  id: string;
+  name: string;
+  categories: string[] | null;
+  verified: boolean;
+  connected: boolean;
+  connected_at: string | null;
+};
+
+function toManufacturer(row: ManufacturerRow): Manufacturer {
+  return {
+    id: row.id,
+    name: row.name,
+    categories: row.categories ?? [],
+    verified: row.verified,
+    connected: row.connected,
+    connectedAt: row.connected_at,
+  };
 }
 
 export async function getManufacturers(): Promise<Manufacturer[]> {
@@ -63,12 +94,33 @@ export async function getManufacturers(): Promise<Manufacturer[]> {
     console.error("Could not load manufacturers", error.message);
     return [];
   }
-  return (data ?? []).map((row: { id: string; name: string; connected: boolean; connected_at: string | null }) => ({
-    id: row.id,
-    name: row.name,
-    connected: row.connected,
-    connectedAt: row.connected_at,
-  }));
+  return ((data ?? []) as ManufacturerRow[]).map(toManufacturer);
+}
+
+/** One manufacturer's profile, or null when it does not exist (or the person is not a retailer). */
+export async function getManufacturer(id: string): Promise<ManufacturerProfile | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_manufacturer", { p_manufacturer: id });
+  if (error) {
+    console.error("Could not load the manufacturer", error.message);
+    return null;
+  }
+  const row = (data as (ManufacturerRow & {
+    registered_name: string | null;
+    rc_number: string | null;
+    address: string | null;
+    brands: string[] | null;
+    contact_email: string | null;
+  })[] | null)?.[0];
+  if (!row) return null;
+  return {
+    ...toManufacturer(row),
+    registeredName: row.registered_name,
+    rcNumber: row.rc_number,
+    address: row.address,
+    brands: row.brands ?? [],
+    contactEmail: row.contact_email,
+  };
 }
 
 /** Checks a carton for a branch. This also records the scan. */
