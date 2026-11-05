@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CartonResultView } from "@/components/retailer/carton-result";
+import { DeliveryTracker } from "@/components/retailer/delivery-tracker";
 import { RetailerHeader } from "@/components/retailer/retailer-header";
 import { branchNotice, PendingNotice } from "@/components/retailer/notice";
 import { getRetailerContext, verifyCarton } from "@/lib/retailer/data";
@@ -10,7 +11,12 @@ export const metadata: Metadata = { title: "Carton result", robots: { index: fal
 
 export default async function CartonResultPage({ params }: { params: Promise<{ code: string }> }) {
   const { code: raw } = await params;
-  const code = decodeURIComponent(raw);
+  let code = raw;
+  try {
+    code = decodeURIComponent(raw);
+  } catch {
+    // A malformed escape in the address: check the text as it came.
+  }
   const shop = await getRetailerContext();
   const notice = shop ? branchNotice(shop) : null;
   if (!shop || !shop.activeBranch || notice) {
@@ -52,7 +58,7 @@ export default async function CartonResultPage({ params }: { params: Promise<{ c
   }
   return (
     <>
-      <RetailerHeader />
+      <DeliveryTracker carton={result.carton?.cartonNumber ?? code} />
       <CartonResultView code={code} result={result} now={new Date()} />
     </>
   );

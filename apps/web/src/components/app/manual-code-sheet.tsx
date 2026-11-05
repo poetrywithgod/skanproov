@@ -7,16 +7,7 @@ import { formatPin } from "@/lib/code";
 import { site } from "@/lib/site";
 
 /** Bottom sheet for typing the 12-digit backup code printed under the scratch-off coating. */
-export function ManualCodeSheet({
-  open,
-  onClose,
-  variant = "product",
-}: {
-  open: boolean;
-  onClose: () => void;
-  variant?: "product" | "carton";
-}) {
-  const carton = variant === "carton";
+export function ManualCodeSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const titleId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -38,17 +29,6 @@ export function ManualCodeSheet({
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (carton) {
-      const code = value.trim().replace(/\s+/g, "");
-      if (!/^[A-Za-z0-9_-]{4,64}$/.test(code)) {
-        setError("Enter the carton code exactly as printed (letters, numbers and dashes).");
-        inputRef.current?.focus();
-        return;
-      }
-      setPending(true);
-      router.push(`${site.retailer.result}/${encodeURIComponent(code)}`);
-      return;
-    }
     const digits = value.replace(/\D/g, "");
     if (digits.length !== 12) {
       setError("Enter all 12 digits of the backup code.");
@@ -71,10 +51,10 @@ export function ManualCodeSheet({
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 id={titleId} className="text-lg font-bold tracking-normal text-ink">
-              {carton ? "Enter carton code" : "Enter backup code"}
+              Enter backup code
             </h2>
             <p className="mt-1 text-[13px] leading-[1.45] text-body">
-              {carton ? "Type the code printed under the QR code on the carton label." : "Scratch off the silver coating on the seal and type the 12 digits underneath."}
+              Scratch off the silver coating on the seal and type the 12 digits underneath.
             </p>
           </div>
           <button
@@ -89,19 +69,19 @@ export function ManualCodeSheet({
 
         <form onSubmit={onSubmit} noValidate className="mt-5">
           <label htmlFor={`${titleId}-pin`} className="sr-only">
-            {carton ? "Carton code" : "12-digit backup code"}
+            12-digit backup code
           </label>
           <input
             ref={inputRef}
             id={`${titleId}-pin`}
             value={value}
             onChange={(event) => {
-              setValue(carton ? event.target.value.toUpperCase().slice(0, 64) : formatPin(event.target.value));
+              setValue(formatPin(event.target.value));
               setError(null);
             }}
-            inputMode={carton ? "text" : "numeric"}
+            inputMode="numeric"
             autoComplete="off"
-            placeholder={carton ? "CT-000123" : "0000 0000 0000"}
+            placeholder="0000 0000 0000"
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? `${titleId}-error` : undefined}
             className={`block h-14 w-full rounded-xl border bg-white px-4 text-center font-mono text-xl tracking-[0.18em] text-ink outline-none placeholder:text-field-placeholder focus:border-brand focus:ring-4 focus:ring-brand/15 ${
@@ -119,7 +99,7 @@ export function ManualCodeSheet({
             disabled={pending}
             className="mt-4 flex h-[52px] w-full items-center justify-center rounded-xl bg-brand text-[15px] font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-70"
           >
-            {pending ? "Checking…" : carton ? "Check carton" : "Verify product"}
+            {pending ? "Checking…" : "Verify product"}
           </button>
         </form>
       </div>

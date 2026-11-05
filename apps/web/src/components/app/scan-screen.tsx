@@ -19,7 +19,7 @@ const CAMERA_MESSAGES: Record<Exclude<CameraState, "starting" | "scanning">, { t
   },
   unavailable: {
     title: "No camera found",
-    body: "We couldn't open a camera on this device. You can enter the code by hand instead.",
+    body: "We couldn't open a camera on this device. You can enter the 12-digit backup code instead.",
   },
   insecure: {
     title: "Camera needs a secure connection",
@@ -27,17 +27,7 @@ const CAMERA_MESSAGES: Record<Exclude<CameraState, "starting" | "scanning">, { t
   },
 };
 
-export function ScanScreen({
-  initialManual = false,
-  variant = "product",
-}: {
-  initialManual?: boolean;
-  /** "carton" is the retailer scanner: it checks cartons, not shopper products. */
-  variant?: "product" | "carton";
-}) {
-  const carton = variant === "carton";
-  const resultBase = carton ? site.retailer.result : site.links.verify;
-  const backHref = carton ? site.retailer.home : site.links.home;
+export function ScanScreen({ initialManual = false }: { initialManual?: boolean }) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const scannerRef = useRef<QrScannerType | null>(null);
@@ -93,7 +83,7 @@ export function ScanScreen({
           handledRef.current = true;
           scanner.stop();
           navigator.vibrate?.(40);
-          router.push(`${resultBase}/${encodeURIComponent(code)}`);
+          router.push(`${site.links.verify}/${encodeURIComponent(code)}`);
         },
         {
           preferredCamera: facing,
@@ -127,7 +117,7 @@ export function ScanScreen({
       scannerRef.current = null;
     };
     // `facing` and `attempt` intentionally restart the camera.
-  }, [facing, attempt, router, resultBase]);
+  }, [facing, attempt, router]);
 
   useEffect(() => {
     if (!notice) return;
@@ -158,7 +148,7 @@ export function ScanScreen({
         {camera === "scanning" ? <div className="absolute inset-0 bg-black/25" aria-hidden="true" /> : null}
 
         <Link
-          href={backHref}
+          href={site.links.home}
           aria-label="Back"
           className="absolute left-4 top-4 grid size-10 place-items-center rounded-full bg-black/45 text-white backdrop-blur hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-white"
         >
@@ -251,28 +241,6 @@ export function ScanScreen({
         </button>
       </section>
 
-      {carton ? (
-        <section className="rounded-2xl bg-white p-3 shadow-[0_1px_4px_rgba(15,31,23,0.06)]">
-          <div className="flex items-center gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand text-white">
-              <KeypadIcon className="size-[18px]" />
-            </span>
-            <div className="min-w-0">
-              <h2 className="text-[15px] font-bold leading-5 text-ink">Label damaged or unreadable?</h2>
-              <p className="text-xs leading-[1.4] text-body">Type the carton code printed under the QR code</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setManualOpen(true)}
-            className="mt-3 flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-brand text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-          >
-            <KeyboardIcon className="size-[18px]" />
-            Enter Carton Code
-          </button>
-        </section>
-      ) : (
-        <>
       <section className="rounded-2xl bg-white p-3 shadow-[0_1px_4px_rgba(15,31,23,0.06)]">
         <div className="flex items-center gap-3">
           <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand text-white">
@@ -304,10 +272,7 @@ export function ScanScreen({
         </div>
       </aside>
 
-        </>
-      )}
-
-      <ManualCodeSheet open={manualOpen} onClose={closeManual} variant={variant} />
+      <ManualCodeSheet open={manualOpen} onClose={closeManual} />
     </div>
   );
 }

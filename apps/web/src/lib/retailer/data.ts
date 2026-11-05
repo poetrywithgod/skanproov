@@ -147,10 +147,13 @@ export async function verifyCarton(code: string, branchId: string): Promise<Cart
       expires_on: string | null;
     };
   };
+  // The time it was saved to History. A repeat scan with the same result keeps the first time.
+  const { data: saved } = await supabase.from("carton_scans").select("scanned_at").eq("id", row.scan_id).maybeSingle();
   return {
     status: row.status,
     reason: row.reason,
     scanId: row.scan_id,
+    scannedAt: (saved?.scanned_at as string | undefined) ?? new Date().toISOString(),
     received: row.received,
     carton: row.carton
       ? {

@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
-import { ScanScreen } from "@/components/app/scan-screen";
+import { CartonScanScreen } from "@/components/retailer/carton-scan-screen";
 import { RetailerHeader } from "@/components/retailer/retailer-header";
 import { branchNotice, PendingNotice } from "@/components/retailer/notice";
 import { getRetailerContext } from "@/lib/retailer/data";
 
 export const metadata: Metadata = { title: "Scan a carton", robots: { index: false } };
 
-export default async function RetailerScanPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ manual?: string }>;
-}) {
-  const { manual } = await searchParams;
+export default async function RetailerScanPage() {
   const shop = await getRetailerContext();
   const notice = shop ? branchNotice(shop) : null;
   if (notice) {
@@ -24,10 +19,5 @@ export default async function RetailerScanPage({
       </>
     );
   }
-  return (
-    <>
-      <RetailerHeader />
-      <ScanScreen variant="carton" initialManual={manual === "1"} />
-    </>
-  );
+  return <CartonScanScreen />;
 }

@@ -8,11 +8,19 @@ import { ScanIcon } from "@/components/icons";
 import { site } from "@/lib/site";
 import { FactoryIcon } from "./icons";
 
-type Tab = { label: string; href: string; Icon: ComponentType<SVGProps<SVGSVGElement>>; exact?: boolean };
+type Tab = {
+  label: string;
+  href: string;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  exact?: boolean;
+  /** Other screens that belong under this tab. */
+  also?: string[];
+};
 
 const LEFT: Tab[] = [
   { label: "Home", href: site.retailer.home, Icon: HomeIcon, exact: true },
-  { label: "Manufacturer", href: site.retailer.manufacturers, Icon: FactoryIcon },
+  // Scanning a carton and its result belong to the Manufacturer tab, as in the designs.
+  { label: "Manufacturer", href: site.retailer.manufacturers, Icon: FactoryIcon, also: [site.retailer.scan, site.retailer.result] },
 ];
 const RIGHT: Tab[] = [
   { label: "History", href: site.retailer.history, Icon: HistoryIcon },
@@ -20,7 +28,8 @@ const RIGHT: Tab[] = [
 ];
 
 function TabLink({ tab, pathname }: { tab: Tab; pathname: string }) {
-  const active = tab.exact ? pathname === tab.href : pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+  const under = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const active = tab.exact ? pathname === tab.href : under(tab.href) || (tab.also ?? []).some(under);
   return (
     <Link
       href={tab.href}
@@ -38,7 +47,7 @@ function TabLink({ tab, pathname }: { tab: Tab; pathname: string }) {
 /** Tab bar for the retailer app. The raised centre button scans a carton. */
 export function RetailerNav() {
   const pathname = usePathname();
-  const scanning = pathname === site.retailer.scan;
+  const scanning = pathname === site.retailer.scan || pathname.startsWith(`${site.retailer.result}/`);
 
   return (
     <nav

@@ -14,7 +14,15 @@ export interface CartonDetails {
 }
 
 export type CartonResult =
-  | { status: CartonStatus; reason: string; scanId: string; received: boolean; carton: CartonDetails | null }
+  | {
+      status: CartonStatus;
+      reason: string;
+      scanId: string;
+      /** When this scan was saved to History (ISO). */
+      scannedAt: string;
+      received: boolean;
+      carton: CartonDetails | null;
+    }
   | { status: "unavailable" };
 
 export interface ScanEntry {
@@ -63,6 +71,23 @@ export function formatScanTime(iso: string, now: Date): string {
   const days = Math.round(hours / 24);
   if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "Africa/Lagos" }).format(then);
+}
+
+const ZONE = "Africa/Lagos";
+
+function dayKey(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: ZONE }).format(date);
+}
+
+/** "Today, 22:26", "Yesterday, 16:30" or "13 Oct, 14:20", in Nigerian time. Used by Result and History. */
+export function formatDayTime(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso);
+  const time = new Intl.DateTimeFormat("en-GB", { timeZone: ZONE, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+  const key = dayKey(date);
+  if (key === dayKey(now)) return `Today, ${time}`;
+  if (key === dayKey(new Date(now.getTime() - 24 * 60 * 60 * 1000))) return `Yesterday, ${time}`;
+  const day = new Intl.DateTimeFormat("en-GB", { timeZone: ZONE, day: "numeric", month: "short" }).format(date);
+  return `${day}, ${time}`;
 }
 
 export function formatDateTime(iso: string): string {
