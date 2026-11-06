@@ -90,6 +90,43 @@ export function formatDayTime(iso: string, now: Date = new Date()): string {
   return `${day}, ${time}`;
 }
 
+/** "Today", "Yesterday" or "13 Oct", in Nigerian time. Heading for a day's scans in History. */
+export function formatDayHeading(iso: string, now: Date = new Date()): { key: string; label: string } {
+  const date = new Date(iso);
+  const key = dayKey(date);
+  if (key === dayKey(now)) return { key, label: "Today" };
+  if (key === dayKey(new Date(now.getTime() - 24 * 60 * 60 * 1000))) return { key, label: "Yesterday" };
+  const sameYear = key.slice(0, 4) === dayKey(now).slice(0, 4);
+  const label = new Intl.DateTimeFormat("en-GB", {
+    timeZone: ZONE,
+    day: "numeric",
+    month: "short",
+    ...(sameYear ? {} : { year: "numeric" }),
+  }).format(date);
+  return { key, label };
+}
+
+/** Time of day only, "22:26", in Nigerian time. */
+export function formatClock(iso: string): string {
+  return new Intl.DateTimeFormat("en-GB", { timeZone: ZONE, hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
+}
+
+export type HistoryFilter = "all" | "received" | "not-received" | "on-hold";
+
+/** Which History filter a scan belongs to. Recalled and expired cartons are on hold too: they must not be sold. */
+export function inFilter(scan: Pick<ScanEntry, "status" | "received">, filter: HistoryFilter): boolean {
+  switch (filter) {
+    case "all":
+      return true;
+    case "received":
+      return scan.status === "safe" && scan.received;
+    case "not-received":
+      return scan.status === "safe" && !scan.received;
+    case "on-hold":
+      return scan.status !== "safe";
+  }
+}
+
 export function formatDateTime(iso: string): string {
   return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
