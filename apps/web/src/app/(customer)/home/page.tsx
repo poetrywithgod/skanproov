@@ -9,6 +9,7 @@ export const metadata: Metadata = { title: "Home", robots: { index: false } };
 
 export default async function HomePage() {
   const user = await requireUser();
+  if (user.accountType === "manufacturer" || user.intendedAccount === "manufacturer") redirect(site.manufacturer.register);
   if (user.accountType === "retailer" || user.intendedAccount === "retailer") redirect(site.retailer.home);
   const data = await getHomeData();
 

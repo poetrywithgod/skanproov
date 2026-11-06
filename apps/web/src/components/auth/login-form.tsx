@@ -7,6 +7,7 @@ import { loginSchema } from "@skanproov/validation";
 import { z } from "zod";
 import { signIn } from "@/lib/auth-client";
 import { needsMfa } from "@/lib/mfa-client";
+import { getRole, type RoleId } from "@/lib/roles";
 import { site } from "@/lib/site";
 import { PasswordField, TextField } from "./fields";
 import { MfaStep } from "./mfa-step";
@@ -18,7 +19,10 @@ export function LoginForm({
   initialError,
   notice,
   checkMfaOnLoad = false,
+  role = null,
 }: {
+  /** Which kind of account the person chose on the landing page. */
+  role?: RoleId | null;
   initialError?: string;
   notice?: string | undefined;
   checkMfaOnLoad?: boolean;
@@ -35,8 +39,12 @@ export function LoginForm({
     void needsMfa().then((needed) => setMfaStep(needed));
   }, [checkMfaOnLoad]);
 
+  const chosen = getRole(role);
+
   function finish() {
-    router.replace(site.links.home);
+    router.replace(
+      role === "manufacturer" ? site.manufacturer.register : role === "retailer" ? site.retailer.home : site.links.home,
+    );
     router.refresh();
   }
 
@@ -136,10 +144,10 @@ export function LoginForm({
       </form>
 
       <Link
-        href={site.links.register}
+        href={chosen?.signUp ?? site.links.register}
         className="mt-4 flex h-[54px] items-center justify-center rounded-xl border border-[#e4e7ec] bg-white text-[15px] font-semibold text-black shadow-[0_2px_6px_rgba(16,24,40,0.06)] transition hover:bg-surface-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
       >
-        Create an account
+        {chosen ? `Create a ${chosen.label.toLowerCase()} account` : "Create an account"}
       </Link>
 
       <div className="mt-5 text-right">

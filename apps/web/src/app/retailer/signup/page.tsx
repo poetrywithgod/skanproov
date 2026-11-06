@@ -11,7 +11,7 @@ export default function RetailerSignupPage() {
       title="Register as a retailer"
       subtitle="Check every carton before it reaches your shelves. Create your account first, then add your shop."
     >
-      <RegisterForm retailer />
+      <RegisterForm role="retailer" />
     </AuthShell>
   );
 }

@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { site } from "@/lib/site";
 import { ButtonLink } from "../button";
-import { ArrowIcon, CheckIcon, PinIcon, ScanIcon } from "../icons";
+import { GetStartedButton } from "../get-started-button";
+import { CheckIcon, PinIcon, ScanIcon } from "../icons";
 
 const details = [
   { label: "Product", value: "ABC Premium" },
@@ -28,10 +29,7 @@ export function Hero() {
           <ScanIcon className="size-4" />
           Scan a product
         </ButtonLink>
-        <ButtonLink href={site.links.getStarted} variant="outline" className="gap-[22px] px-8">
-          Get Started
-          <ArrowIcon className="size-4" />
-        </ButtonLink>
+        <GetStartedButton />
       </div>
 
       <p className="mt-6 text-sm leading-5 text-muted">No account. No app. Scan right here in your browser.</p>

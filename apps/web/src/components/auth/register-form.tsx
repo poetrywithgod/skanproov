@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { registerSchema } from "@skanproov/validation";
 import { z } from "zod";
 import { signUp } from "@/lib/auth-client";
+import { ROLES, type RoleId } from "@/lib/roles";
 import { site } from "@/lib/site";
 import { PasswordField, TextField } from "./fields";
 import { PrimaryButton } from "./primary-button";
@@ -13,7 +14,7 @@ import { PrimaryButton } from "./primary-button";
 type FieldName = "fullName" | "email" | "phone" | "password" | "confirmPassword";
 type Errors = Partial<Record<FieldName, string>>;
 
-export function RegisterForm({ retailer = false }: { retailer?: boolean }) {
+export function RegisterForm({ role = "consumer" }: { role?: RoleId }) {
   const router = useRouter();
   const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
@@ -48,13 +49,15 @@ export function RegisterForm({ retailer = false }: { retailer?: boolean }) {
     setErrors({});
     setPending(true);
     try {
-      const result = await signUp(parsed.data, retailer ? "retailer" : undefined);
+      const result = await signUp(parsed.data, role === "consumer" ? undefined : role);
       if (!result.ok) {
         setFormError(result.message);
       } else if (result.next === "confirm-email") {
         setConfirmEmail(parsed.data.email);
       } else {
-        router.replace(retailer ? site.retailer.register : site.links.home);
+        router.replace(
+          role === "retailer" ? site.retailer.register : role === "manufacturer" ? site.manufacturer.register : site.links.home,
+        );
         router.refresh();
       }
     } catch {
@@ -73,7 +76,7 @@ export function RegisterForm({ retailer = false }: { retailer?: boolean }) {
           Click it to finish creating your account.
         </p>
         <Link
-          href={site.links.login}
+          href={`${site.links.login}?as=${role}`}
           className="mt-4 inline-block text-sm font-semibold text-brand hover:text-brand-deep hover:underline"
         >
           Back to sign in
@@ -140,20 +143,23 @@ export function RegisterForm({ retailer = false }: { retailer?: boolean }) {
 
       <p className="mt-3 text-center text-[15px] font-medium text-ink-title">
         Already have an account?{" "}
-        <Link href={site.links.login} className="font-semibold text-brand hover:text-brand-deep hover:underline">
+        <Link
+          href={`${site.links.login}?as=${role}`}
+          className="font-semibold text-brand hover:text-brand-deep hover:underline"
+        >
           Login
         </Link>
       </p>
       <p className="mt-2 text-center text-sm text-body">
-        {retailer ? (
-          <Link href={site.links.register} className="font-semibold text-brand hover:text-brand-deep hover:underline">
-            Not a shop? Create a shopper account
-          </Link>
-        ) : (
-          <Link href={site.retailer.signup} className="font-semibold text-brand hover:text-brand-deep hover:underline">
-            Own a shop? Register as a retailer
-          </Link>
-        )}
+        Signing up as someone else?{" "}
+        {ROLES.filter((r) => r.id !== role).map((r, index) => (
+          <span key={r.id}>
+            {index > 0 ? " · " : ""}
+            <Link href={r.signUp} className="font-semibold text-brand hover:text-brand-deep hover:underline">
+              {r.label}
+            </Link>
+          </span>
+        ))}
       </p>
     </div>
   );

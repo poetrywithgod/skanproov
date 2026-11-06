@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { site } from "@/lib/site";
-import { ButtonLink } from "./button";
+import { RoleIcon } from "./role-icon";
+import { RoleMenu } from "./role-menu";
+import { ROLES } from "@/lib/roles";
 import { CloseIcon, MenuIcon, ScanIcon } from "./icons";
 import { Logo } from "./logo";
 
@@ -28,9 +30,7 @@ export function Header() {
         </nav>
 
         <div className="ml-auto hidden md:ml-7 md:block">
-          <ButtonLink href={site.links.login} variant="dark" size="sm">
-            Log In/ Sign up
-          </ButtonLink>
+          <RoleMenu />
         </div>
 
         <button
@@ -61,10 +61,30 @@ export function Header() {
                 Scan a product
               </Link>
             </li>
-            <li>
-              <ButtonLink href={site.links.login} variant="dark" size="sm">
-                Log In/ Sign up
-              </ButtonLink>
+            <li className="border-t border-line pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">Log in or sign up as</p>
+              <ul className="mt-3 flex flex-col gap-3">
+                {ROLES.map((role) => (
+                  <li key={role.id} className="flex items-center gap-3">
+                    <RoleIcon role={role.id} className="size-9" />
+                    <span className="flex-1 font-semibold text-ink">{role.label}</span>
+                    <Link
+                      href={role.signIn}
+                      onClick={() => setOpen(false)}
+                      className="rounded-lg border border-line bg-white px-3 py-1.5 text-[13px] font-semibold text-ink"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href={role.signUp}
+                      onClick={() => setOpen(false)}
+                      className="rounded-lg bg-brand px-3 py-1.5 text-[13px] font-semibold text-white"
+                    >
+                      Sign up
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </li>
           </ul>
         </nav>

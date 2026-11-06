@@ -6,3 +6,4 @@ export type Verdict = z.infer<typeof verdictSchema>;
 
 export * from "./auth";
 export * from "./retailer";
+export * from "./manufacturer";

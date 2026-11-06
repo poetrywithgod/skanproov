@@ -33,7 +33,7 @@ export async function signIn(input: LoginInput): Promise<AuthResult> {
   }
 }
 
-export async function signUp(input: RegisterData, intended?: "retailer"): Promise<AuthResult> {
+export async function signUp(input: RegisterData, intended?: "retailer" | "manufacturer"): Promise<AuthResult> {
   const supabase = createClient();
   const { data, error } = await supabase.auth.signUp({
     email: input.email,

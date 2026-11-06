@@ -9,7 +9,6 @@ export const site = {
   links: {
     scan: "/scan",
     verify: "/verify", // result screen: /verify/<code>
-    getStarted: "/get-started", // TODO
     login: "/login",
     register: "/register",
     home: "/home",
@@ -37,6 +36,10 @@ export const site = {
     manufacturers: "/retailer/manufacturers",
     history: "/retailer/history",
     profile: "/retailer/profile",
+  },
+  manufacturer: {
+    signup: "/manufacturer/signup",
+    register: "/manufacturer/register", // business details, then waits for approval
   },
   nav: [
     { label: "How it works", href: "#how-it-works" },
