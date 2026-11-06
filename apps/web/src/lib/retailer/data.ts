@@ -14,6 +14,8 @@ export interface Branch {
 export interface RetailerContext {
   id: string;
   businessName: string;
+  storeType: string | null;
+  rcNumber: string | null;
   branches: Branch[];
   /** The branch cartons are scanned for: the first approved one. Null until a branch is approved. */
   activeBranch: Branch | null;
@@ -22,7 +24,7 @@ export interface RetailerContext {
 /** The signed-in person's shop, or null if they have not registered one. Cached per request. */
 export const getRetailerContext = cache(async (): Promise<RetailerContext | null> => {
   const supabase = await createClient();
-  const { data: retailer, error } = await supabase.from("retailers").select("id, business_name").maybeSingle();
+  const { data: retailer, error } = await supabase.from("retailers").select("id, business_name, store_type, rc_number").maybeSingle();
   if (error) console.error("Could not load the retailer", error.message);
   if (!retailer) return null;
 
@@ -44,8 +46,38 @@ export const getRetailerContext = cache(async (): Promise<RetailerContext | null
   return {
     id: retailer.id,
     businessName: retailer.business_name,
+    storeType: retailer.store_type,
+    rcNumber: retailer.rc_number,
     branches,
     activeBranch: branches.find((b) => b.status === "approved") ?? null,
+  };
+});
+
+export interface ProfileChange {
+  businessName: string;
+  storeType: string;
+  rcNumber: string | null;
+  status: "pending" | "approved" | "rejected";
+  reviewNote: string | null;
+  requestedAt: string;
+}
+
+/** The shop's latest business-details change request, if it is still waiting or was turned down. */
+export const getProfileChange = cache(async (): Promise<ProfileChange | null> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("retailer_profile_changes")
+    .select("business_name, store_type, rc_number, status, review_note, created_at")
+    .maybeSingle();
+  if (error) console.error("Could not load the change request", error.message);
+  if (!data || data.status === "approved") return null;
+  return {
+    businessName: data.business_name,
+    storeType: data.store_type,
+    rcNumber: data.rc_number,
+    status: data.status as ProfileChange["status"],
+    reviewNote: data.review_note,
+    requestedAt: data.created_at,
   };
 });
 

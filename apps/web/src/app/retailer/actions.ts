@@ -1,6 +1,6 @@
 "use server";
 
-import { retailerRegisterSchema } from "@skanproov/validation";
+import { retailerProfileSchema, retailerRegisterSchema } from "@skanproov/validation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
@@ -61,4 +61,29 @@ export async function markReceivedAction(formData: FormData) {
   const { error } = await supabase.rpc("retailer_receive_carton", { p_scan: scanId });
   if (error) console.error("Could not mark received", error.message);
   revalidatePath("/retailer", "layout");
+}
+
+export type ProfileChangeResult =
+  | { ok: true }
+  | { ok: false; message?: string; fields?: Partial<Record<"business" | "storeType" | "rcNumber", string>> };
+
+/** Sends new business details to be checked. Nothing changes on the shop until a Super Admin approves. */
+export async function requestProfileChangeAction(input: unknown): Promise<ProfileChangeResult> {
+  const parsed = retailerProfileSchema.safeParse(input);
+  if (!parsed.success) {
+    const f = z.flattenError(parsed.error).fieldErrors;
+    return { ok: false, fields: { business: f.business?.[0], storeType: f.storeType?.[0], rcNumber: f.rcNumber?.[0] } };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("request_retailer_profile_change", {
+    p_business: parsed.data.business,
+    p_store_type: parsed.data.storeType,
+    p_rc: parsed.data.rcNumber ?? "",
+  });
+  if (error) {
+    console.error("request_retailer_profile_change failed", error.message);
+    return { ok: false, message: "We couldn't send your changes. Please try again." };
+  }
+  revalidatePath("/retailer", "layout");
+  return { ok: true };
 }

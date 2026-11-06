@@ -36,6 +36,7 @@ export const site = {
     manufacturers: "/retailer/manufacturers",
     history: "/retailer/history",
     profile: "/retailer/profile",
+    businessProfile: "/retailer/profile/business",
   },
   manufacturer: {
     signup: "/manufacturer/signup",
