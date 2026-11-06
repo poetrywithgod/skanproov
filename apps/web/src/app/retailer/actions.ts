@@ -87,3 +87,11 @@ export async function requestProfileChangeAction(input: unknown): Promise<Profil
   revalidatePath("/retailer", "layout");
   return { ok: true };
 }
+
+/** Marks everything up to now as read. */
+export async function markNotificationsReadAction() {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("mark_retailer_notifications_read");
+  if (error) console.error("mark_retailer_notifications_read failed", error.message);
+  revalidatePath("/retailer", "layout");
+}

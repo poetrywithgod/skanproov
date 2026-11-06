@@ -35,6 +35,7 @@ export const site = {
     result: "/retailer/result", // /retailer/result/<code>
     manufacturers: "/retailer/manufacturers",
     history: "/retailer/history",
+    notifications: "/retailer/notifications",
     profile: "/retailer/profile",
     businessProfile: "/retailer/profile/business",
   },

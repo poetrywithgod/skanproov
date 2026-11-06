@@ -16,6 +16,8 @@ export interface RetailerContext {
   businessName: string;
   storeType: string | null;
   rcNumber: string | null;
+  /** When "Mark all read" was last pressed. Notifications newer than this are unread. */
+  notificationsReadAt: string | null;
   branches: Branch[];
   /** The branch cartons are scanned for: the first approved one. Null until a branch is approved. */
   activeBranch: Branch | null;
@@ -24,7 +26,7 @@ export interface RetailerContext {
 /** The signed-in person's shop, or null if they have not registered one. Cached per request. */
 export const getRetailerContext = cache(async (): Promise<RetailerContext | null> => {
   const supabase = await createClient();
-  const { data: retailer, error } = await supabase.from("retailers").select("id, business_name, store_type, rc_number").maybeSingle();
+  const { data: retailer, error } = await supabase.from("retailers").select("id, business_name, store_type, rc_number, notifications_read_at").maybeSingle();
   if (error) console.error("Could not load the retailer", error.message);
   if (!retailer) return null;
 
@@ -48,6 +50,7 @@ export const getRetailerContext = cache(async (): Promise<RetailerContext | null
     businessName: retailer.business_name,
     storeType: retailer.store_type,
     rcNumber: retailer.rc_number,
+    notificationsReadAt: retailer.notifications_read_at,
     branches,
     activeBranch: branches.find((b) => b.status === "approved") ?? null,
   };
@@ -60,17 +63,18 @@ export interface ProfileChange {
   status: "pending" | "approved" | "rejected";
   reviewNote: string | null;
   requestedAt: string;
+  reviewedAt: string | null;
 }
 
 /** The shop's latest business-details change request, if it is still waiting or was turned down. */
-export const getProfileChange = cache(async (): Promise<ProfileChange | null> => {
+const loadProfileChange = cache(async (): Promise<ProfileChange | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("retailer_profile_changes")
-    .select("business_name, store_type, rc_number, status, review_note, created_at")
+    .select("business_name, store_type, rc_number, status, review_note, created_at, reviewed_at")
     .maybeSingle();
   if (error) console.error("Could not load the change request", error.message);
-  if (!data || data.status === "approved") return null;
+  if (!data) return null;
   return {
     businessName: data.business_name,
     storeType: data.store_type,
@@ -78,8 +82,18 @@ export const getProfileChange = cache(async (): Promise<ProfileChange | null> =>
     status: data.status as ProfileChange["status"],
     reviewNote: data.review_note,
     requestedAt: data.created_at,
+    reviewedAt: data.reviewed_at,
   };
 });
+
+/** The change request if it is still waiting or was turned down. An approved one has already applied. */
+export async function getProfileChange(): Promise<ProfileChange | null> {
+  const change = await loadProfileChange();
+  return change && change.status !== "approved" ? change : null;
+}
+
+/** The latest request whatever its outcome, for notifications. */
+export const getLatestProfileChange = loadProfileChange;
 
 export interface Manufacturer {
   id: string;

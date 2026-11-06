@@ -17,7 +17,18 @@ function subLine(scan: ScanEntry) {
   return scan.carton ?? scan.code;
 }
 
-export function RetailerHomeView({ shop, data, now = new Date() }: { shop: RetailerContext; data: RetailerHome; now?: Date }) {
+export function RetailerHomeView({
+  shop,
+  data,
+  unread = 0,
+  now = new Date(),
+}: {
+  shop: RetailerContext;
+  data: RetailerHome;
+  /** Notifications not yet marked read. */
+  unread?: number;
+  now?: Date;
+}) {
   const notice = branchNotice(shop);
   const resultHref = (scan: ScanEntry) => `${site.retailer.result}/${encodeURIComponent(scan.code)}`;
 
@@ -29,11 +40,16 @@ export function RetailerHomeView({ shop, data, now = new Date() }: { shop: Retai
           <p className="mt-0.5 text-[13px] leading-5 text-body">Check stock before it reaches your shelves.</p>
         </div>
         <Link
-          href="#updates"
-          aria-label="Updates"
+          href={site.retailer.notifications}
+          aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
           className="relative grid size-11 shrink-0 place-items-center rounded-full bg-[#e6eee8] text-ink hover:bg-[#dbe7df] focus-visible:outline-2 focus-visible:outline-brand"
         >
           <BellIcon className="size-5" />
+          {unread > 0 ? (
+            <span className="absolute -right-0.5 -top-0.5 grid min-w-[18px] place-items-center rounded-full bg-danger px-1 text-[11px] font-bold leading-[18px] text-white ring-2 ring-white">
+              {unread > 9 ? "9+" : unread}
+            </span>
+          ) : null}
         </Link>
       </section>
 
