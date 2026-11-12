@@ -1,43 +1,32 @@
 "use server";
 
-import { manufacturerApplySchema } from "@skanproov/validation";
+import { manufacturerCompanySchema } from "@skanproov/validation";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { getCompanyDraft } from "@/lib/manufacturer/data";
 import { createClient } from "@/lib/supabase/server";
 
-type FieldName = "company" | "rcNumber" | "nafdacNumber" | "category" | "address" | "city";
-export type ApplyResult = { ok: true } | { ok: false; message?: string; fields?: Partial<Record<FieldName, string>> };
+export type SubmitResult = { ok: true } | { ok: false; message: string };
 
-/** Sends the company's details to SKANPROOV to be checked. */
-export async function applyManufacturerAction(input: unknown): Promise<ApplyResult> {
-  const parsed = manufacturerApplySchema.safeParse(input);
-  if (!parsed.success) {
-    const f = z.flattenError(parsed.error).fieldErrors;
-    return {
-      ok: false,
-      fields: {
-        company: f.company?.[0],
-        rcNumber: f.rcNumber?.[0],
-        nafdacNumber: f.nafdacNumber?.[0],
-        category: f.category?.[0],
-        address: f.address?.[0],
-        city: f.city?.[0],
-      },
-    };
-  }
+/**
+ * Sends the company's details and uploaded documents to SKANPROOV to be checked.
+ * The details come from the sign-up page (kept in the person's sign-up data), never from the browser
+ * at this point. A rejected application is sent again with the details it already has.
+ */
+export async function submitApplicationAction(): Promise<SubmitResult> {
+  const draft = await getCompanyDraft();
+  const details = draft ? manufacturerCompanySchema.parse(draft) : null;
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("apply_manufacturer", {
-    p_company: parsed.data.company,
-    p_rc: parsed.data.rcNumber,
-    p_nafdac: parsed.data.nafdacNumber ?? "",
-    p_category: parsed.data.category,
-    p_address: parsed.data.address,
-    p_city: parsed.data.city,
-  });
+  const { error } = await supabase.rpc("submit_manufacturer_application", { p: details });
   if (error) {
     if (/already applied/i.test(error.message)) return { ok: true };
-    console.error("apply_manufacturer failed", error.message);
+    if (/missing documents/i.test(error.message)) {
+      return { ok: false, message: "Please upload your company registration certificate and a director's ID first." };
+    }
+    if (/no details/i.test(error.message)) {
+      return { ok: false, message: "We don't have your company details. Please register your company again." };
+    }
+    console.error("submit_manufacturer_application failed", error.message);
     return { ok: false, message: "We couldn't send your application. Please try again." };
   }
   revalidatePath("/manufacturer", "layout");

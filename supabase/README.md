@@ -12,6 +12,7 @@ Run the files in `migrations/` in order in the Supabase SQL Editor (or with the 
 6. `20261102090000_geotagging.sql`: the optional "GPS scan geotagging" setting and `attach_scan_location`.
 7. `20261103100000_retailer.sql`: retailers, branches, manufacturer connections, cartons and carton scanning.
 8. `20261105090000_manufacturer_profiles.sql`: manufacturer profile details (registered name, RC number, address, categories, brands, contact) and `get_manufacturer`.
+9. `20261112100000_manufacturer_registration.sql`: the "Register your Company" details, the private `manufacturer-documents` storage bucket, document upload functions and `submit_manufacturer_application` (replaces `apply_manufacturer`). Run it after `20261106090000_manufacturer_applications.sql`.
 
 ### Test data (development projects only)
 

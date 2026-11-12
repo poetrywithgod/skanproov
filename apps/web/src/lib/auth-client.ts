@@ -1,4 +1,4 @@
-import type { LoginInput, RegisterData } from "@skanproov/validation";
+import type { LoginInput, ManufacturerCompany, RegisterData } from "@skanproov/validation";
 import { createClient } from "@/lib/supabase/browser";
 
 export type AuthResult =
@@ -33,6 +33,22 @@ export async function signIn(input: LoginInput): Promise<AuthResult> {
   }
 }
 
+function signUpErrorMessage(code: string | undefined): string {
+  switch (code) {
+    case "weak_password":
+      return "That password is too easy to guess. Please choose a stronger one.";
+    case "over_request_rate_limit":
+    case "over_email_send_rate_limit":
+      return "Too many attempts. Please wait a few minutes and try again.";
+    case "unexpected_failure":
+      // The profile insert is rejected (e.g. phone number already registered) and Supabase
+      // reports it generically. Stay vague on purpose: no hints about which accounts exist.
+      return "We couldn't create that account. The e-mail or phone number may already be registered.";
+    default:
+      return GENERIC_ERROR;
+  }
+}
+
 export async function signUp(input: RegisterData, intended?: "retailer" | "manufacturer"): Promise<AuthResult> {
   const supabase = createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -46,26 +62,34 @@ export async function signUp(input: RegisterData, intended?: "retailer" | "manuf
     },
   });
 
-  if (error) {
-    switch (error.code) {
-      case "weak_password":
-        return { ok: false, message: "That password is too easy to guess. Please choose a stronger one." };
-      case "over_request_rate_limit":
-      case "over_email_send_rate_limit":
-        return { ok: false, message: "Too many attempts. Please wait a few minutes and try again." };
-      case "unexpected_failure":
-        // The profile insert is rejected (e.g. phone number already registered) and Supabase
-        // reports it generically. Stay vague on purpose: no hints about which accounts exist.
-        return {
-          ok: false,
-          message: "We couldn't create that account. The e-mail or phone number may already be registered.",
-        };
-      default:
-        return { ok: false, message: GENERIC_ERROR };
-    }
-  }
+  if (error) return { ok: false, message: signUpErrorMessage(error.code) };
 
   // With e-mail confirmation on (Supabase default) there is no session until the link is clicked.
+  return { ok: true, next: data.session ? "account" : "confirm-email" };
+}
+
+/**
+ * Creates a manufacturer's account. The company e-mail is the sign-in e-mail, and the contact
+ * person's name and phone become the profile. The company details are kept in the sign-up data
+ * (`company_draft`) until the e-mail is confirmed, because nothing can be saved for the company
+ * before there is a signed-in session. The profile trigger ignores everything except name and phone.
+ */
+export async function signUpManufacturer(company: ManufacturerCompany, password: string): Promise<AuthResult> {
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email: company.companyEmail,
+    password,
+    options: {
+      data: {
+        full_name: company.contactName,
+        phone: company.contactPhone,
+        intended_account: "manufacturer",
+        company_draft: company,
+      },
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
+  if (error) return { ok: false, message: signUpErrorMessage(error.code) };
   return { ok: true, next: data.session ? "account" : "confirm-email" };
 }
 
