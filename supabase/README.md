@@ -15,6 +15,7 @@ Run the files in `migrations/` in order in the Supabase SQL Editor (or with the 
 9. `20261112100000_manufacturer_registration.sql`: the "Register your Company" details, the private `manufacturer-documents` storage bucket, document upload functions and `submit_manufacturer_application` (replaces `apply_manufacturer`). Run it after `20261106090000_manufacturer_applications.sql`.
 10. `20261113100000_manufacturer_portal.sql`: links a person to their manufacturer (`manufacturer_members`, `my_manufacturer`) and adds `approve_manufacturer_application`. Until the Super Admin app exists, approve a company by hand in the SQL Editor: `select public.approve_manufacturer_application('<application id>');` (find the id with `select id, company_name, status from public.manufacturer_applications;`).
 11. `20261113150000_products.sql`: product details (SKU, category, brand, picture and so on), batch units, the public `product-images` bucket, and the functions behind the Products screens (`my_products`, `my_product`, `my_product_batches`, `save_product`). Run it after `20261113100000_manufacturer_portal.sql`.
+12. `20261113200000_batches.sql`: batch details (number, facility, notes, certificate), the private `batch-certificates` bucket, and the functions behind the Batches screens (`my_batches`, `my_batch`, `declare_batch`, `release_batch`). Run it after `20261113150000_products.sql`.
 
 ### Test data (development projects only)
 

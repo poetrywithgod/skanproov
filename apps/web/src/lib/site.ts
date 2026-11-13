@@ -44,6 +44,7 @@ export const site = {
     register: "/manufacturer/register", // business details, then waits for approval
     home: "/manufacturer", // the portal; opens on Products until the Overview is built
     products: "/manufacturer/products",
+    batches: "/manufacturer/batches",
   },
   nav: [
     { label: "How it works", href: "#how-it-works" },

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BatchTable, batchState } from "@/components/manufacturer/portal/products/batch-table";
 import { AddProductButton, Breadcrumb, InfoNote, PageHeading, ProductThumb, StatCard, StatusPill, formatDate, formatNumber } from "@/components/manufacturer/portal/products/bits";
+import { DeclareBatchButton } from "@/components/manufacturer/portal/batches/bits";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
 import { getProduct, getProductBatches, productCode } from "@/lib/manufacturer/products";
 import { site } from "@/lib/site";
@@ -36,7 +37,11 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
       <PortalTopBar title="Products" />
       <main className="px-5 py-6 sm:px-8">
         <Breadcrumb current="Product details" />
-        <PageHeading title={product.name} subtitle="View product information and manage its associated production batches." action={<AddProductButton />} />
+        <PageHeading
+          title={product.name}
+          subtitle="View product information and manage its associated production batches."
+          action={product.status === "registered" ? <DeclareBatchButton productId={product.id} /> : <AddProductButton />}
+        />
 
         <section className="mt-6 rounded-xl border border-line bg-white" aria-label="Product information">
           <div className="flex flex-col gap-6 p-6 sm:flex-row">
@@ -109,9 +114,14 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
               <p className="text-base font-semibold text-ink">No batches yet</p>
               <p className="mx-auto mt-1 max-w-md text-sm text-muted">
                 {product.status === "registered"
-                  ? "Declaring a batch for this product is the next step of the build."
+                  ? "Declare a production batch to start generating codes for this product."
                   : "Register this product first. Only registered products can have batches."}
               </p>
+              {product.status === "registered" ? (
+                <div className="mt-4 flex justify-center">
+                  <DeclareBatchButton productId={product.id} />
+                </div>
+              ) : null}
             </div>
           ) : (
             <div className="border-t border-row-line">

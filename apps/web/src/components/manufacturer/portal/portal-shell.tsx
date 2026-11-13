@@ -22,7 +22,7 @@ type NavItem = {
 const NAV: readonly NavItem[] = [
   { label: "Overview", icon: OverviewIcon },
   { label: "Products", icon: ProductsIcon, href: site.manufacturer.products },
-  { label: "Batches", icon: BatchesIcon },
+  { label: "Batches", icon: BatchesIcon, href: site.manufacturer.batches },
   { label: "Code Management", icon: CodesIcon },
   { label: "Notification", icon: BellIcon },
 ];
