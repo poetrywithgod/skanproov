@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ApplicationStatus } from "@/components/manufacturer/application-status";
 import { CompanyShell } from "@/components/manufacturer/company-shell";
 import { DocumentsForm } from "@/components/manufacturer/documents-form";
 import { getCompanyDraft, getMyApplication, getMyDocuments } from "@/lib/manufacturer/data";
+import { getManufacturerContext } from "@/lib/manufacturer/portal";
 import { site } from "@/lib/site";
 import { requireUser } from "@/lib/supabase/user";
 
@@ -11,6 +13,8 @@ export const metadata: Metadata = { title: "Your company", robots: { index: fals
 
 export default async function ManufacturerRegisterPage() {
   const user = await requireUser();
+  // Approved companies go straight to the portal.
+  if (await getManufacturerContext()) redirect(site.manufacturer.home);
   const application = await getMyApplication();
 
   // Waiting for a decision, or approved: nothing more to upload.

@@ -42,7 +42,7 @@ export function ManufacturerProfileView({ profile }: { profile: ManufacturerProf
             {profile.verified ? (
               <p className="mt-0.5 flex items-center gap-1.5 text-sm font-semibold text-retail">
                 <BadgeCheckIcon className="size-[18px] shrink-0" />
-                Business verified by SkanProof
+                Business verified by SKANPROOV
               </p>
             ) : null}
           </div>
