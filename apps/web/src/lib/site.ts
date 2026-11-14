@@ -46,6 +46,7 @@ export const site = {
     products: "/manufacturer/products",
     batches: "/manufacturer/batches",
     codes: "/manufacturer/code-management",
+    notifications: "/manufacturer/notifications",
   },
   nav: [
     { label: "How it works", href: "#how-it-works" },
