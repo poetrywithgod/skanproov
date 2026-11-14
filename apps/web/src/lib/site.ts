@@ -45,6 +45,7 @@ export const site = {
     home: "/manufacturer", // the portal; opens on Products until the Overview is built
     products: "/manufacturer/products",
     batches: "/manufacturer/batches",
+    codes: "/manufacturer/code-management",
   },
   nav: [
     { label: "How it works", href: "#how-it-works" },

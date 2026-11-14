@@ -33,6 +33,9 @@ export interface BatchProductOption {
   name: string;
   variant: string | null;
   sku: string | null;
+  nafdacNumber: string | null;
+  category: string | null;
+  packSize: string | null;
   status: ProductStatus;
 }
 

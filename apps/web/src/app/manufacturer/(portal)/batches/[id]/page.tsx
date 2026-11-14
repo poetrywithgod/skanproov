@@ -91,7 +91,17 @@ export default async function BatchDetailsPage({ params }: { params: Promise<{ i
             View product
           </Link>
         </div>
-        <InfoNote>Generating codes for a batch comes in the next step.</InfoNote>
+        {!batch.releasedAt && batch.status === "active" && remaining !== null && remaining > 0 ? (
+          <div className="mt-6">
+            <Link
+              href={`${site.manufacturer.codes}?batch=${batch.id}`}
+              className="inline-flex h-12 items-center rounded-xl bg-retail px-5 text-[15px] font-semibold text-white transition hover:bg-retail-dark"
+            >
+              Generate codes
+            </Link>
+          </div>
+        ) : null}
+        <InfoNote>Codes are generated per batch, one for every unit, and start to verify when you release the batch.</InfoNote>
       </main>
     </>
   );

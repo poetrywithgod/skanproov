@@ -9,3 +9,4 @@ export * from "./retailer";
 export * from "./manufacturer";
 export * from "./product";
 export * from "./batch";
+export * from "./codes";

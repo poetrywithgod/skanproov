@@ -23,7 +23,7 @@ const NAV: readonly NavItem[] = [
   { label: "Overview", icon: OverviewIcon },
   { label: "Products", icon: ProductsIcon, href: site.manufacturer.products },
   { label: "Batches", icon: BatchesIcon, href: site.manufacturer.batches },
-  { label: "Code Management", icon: CodesIcon },
+  { label: "Code Management", icon: CodesIcon, href: site.manufacturer.codes },
   { label: "Notification", icon: BellIcon },
 ];
 

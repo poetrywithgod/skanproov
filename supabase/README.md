@@ -17,6 +17,7 @@ Run the files in `migrations/` in order in the Supabase SQL Editor (or with the 
 11. `20261113150000_products.sql`: product details (SKU, category, brand, picture and so on), batch units, the public `product-images` bucket, and the functions behind the Products screens (`my_products`, `my_product`, `my_product_batches`, `save_product`). Run it after `20261113100000_manufacturer_portal.sql`.
 12. `20261113200000_batches.sql`: batch details (number, facility, notes, certificate), the private `batch-certificates` bucket, and the functions behind the Batches screens (`my_batches`, `my_batch`, `declare_batch`, `release_batch`). Run it after `20261113150000_products.sql`.
 13. `20261113220000_code_generation.sql`: code generation runs (`code_runs`), the private `code-files` bucket (CSV and label PDF, kept 30 days), and the functions `generate_codes`, `attach_code_run_files`, `discard_code_run`, `my_code_runs`, `claim_expired_code_files`. Codes are stored as hashes only. Needs the `pgcrypto` extension (Supabase keeps it in the `extensions` schema). Run it after `20261113200000_batches.sql`.
+14. `20261113230000_code_generation_json.sql`: makes `generate_codes` return all codes as one JSON value, because the API cuts lists of rows at 1,000. Run it after `20261113220000_code_generation.sql`.
 
 ### Test data (development projects only)
 

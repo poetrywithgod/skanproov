@@ -15,14 +15,16 @@ export default async function NewBatchPage({ searchParams }: { searchParams: Pro
   const manufacturer = await getManufacturerContext();
   if (!manufacturer) redirect(site.manufacturer.register);
   const { product } = await searchParams;
-  const options = (await getProducts()).filter((p) => p.status === "registered");
+  const options = (await getProducts())
+    .filter((p) => p.status === "registered")
+    .map((p) => ({ id: p.id, name: p.name, variant: p.variant, sku: p.sku, nafdacNumber: p.nafdacNumber, category: p.category, packSize: p.packSize, status: p.status }));
 
   return (
     <>
       <PortalTopBar title="Batches" />
       <main className="max-w-[900px] px-5 py-6 sm:px-8">
         <BatchesBreadcrumb current="Declare batch" />
-        <PageHeading title="Declare a batch" subtitle="Record a production run of one of your registered products." />
+        <PageHeading title="Declare Batch" subtitle="Register a new product batch to enable traceability and code generation." />
         {options.length === 0 ? (
           <div className="mt-6 rounded-xl border border-line bg-white px-6 py-12 text-center" role="status">
             <p className="text-base font-semibold text-ink">No registered products yet</p>
