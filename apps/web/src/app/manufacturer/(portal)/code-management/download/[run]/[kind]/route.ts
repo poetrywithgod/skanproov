@@ -16,6 +16,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ run:
   if (!found || !path) return NextResponse.redirect(back);
 
   const supabase = await createClient();
+  // Every download is an export, so it goes in the audit log (a failure to log must not block the file).
+  await supabase.rpc("record_code_download", { p_run: run, p_kind: kind });
   const { data, error } = await supabase.storage.from(CODE_FILES_BUCKET).createSignedUrl(path, 60, { download: path.split("/").at(-1) ?? true });
   if (error || !data) return NextResponse.redirect(back);
   return NextResponse.redirect(data.signedUrl);

@@ -29,8 +29,7 @@ const NAV: readonly NavItem[] = [
   { label: "Code Management", icon: CodesIcon, href: site.manufacturer.codes, needs: "codes" },
   { label: "Notification", icon: BellIcon, href: site.manufacturer.notifications },
   { label: "Team Management", icon: TeamIcon, href: site.manufacturer.team, needs: "team" },
-  // DEFERRED(D07): Audit Logs screen.
-  { label: "Audit Logs", icon: AuditIcon, needs: "audit" },
+  { label: "Audit Logs", icon: AuditIcon, href: site.manufacturer.audit, needs: "audit" },
 ];
 
 /**

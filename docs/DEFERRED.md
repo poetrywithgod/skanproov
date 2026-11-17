@@ -13,7 +13,6 @@ and its reminder.
 | D04 | Plan and usage: plan name, monthly code allowance, batch declaration limit, usage bar | Sidebar plan card, Overview "Codes generated this month" | Plans and billing; payment gateway not chosen yet | Phase 1, Week 10 |
 | D05 | Seat limit on the team ("7 of 10 seats") | Team Management | Plans and billing (D04) | With D04 |
 | D06 | Invitations sent by e-mail automatically | Team Management, Invite member | A custom e-mail service (SMTP); for now the administrator copies the link | When SMTP is set up |
-| D07 | Audit Logs screen (filter, export) | Sidebar "Soon" | Built on `manufacturer_activity`, which already records events | Phase 1 |
 | D08 | Settings (company, security) and Subscription and billing | Sidebar, role permissions `manage_settings`, `manage_billing` | Confirmation, then D04 | Phase 1 |
 | D09 | Recall and revoke codes action | Role permission `recall_codes` exists but nothing uses it yet | Recall flow design | Phase 1 |
 | D10 | "Download" next to code-generation entries in Recent activity | Overview, Recent activity | Linking an activity entry to its run | Phase 1 |
@@ -22,3 +21,5 @@ and its reminder.
 | D13 | Company approval from the Super Admin app | Register your Company | Super Admin app; today approved by hand with SQL | Phase 1, Week 12 |
 | D14 | Subscription notifications and security notifications | Notifications | Billing (D04) and a security event source | With D04 |
 | D15 | Test-print the label PDF on the real label stock | Code Management | Pilot manufacturer and label stock | Before first print |
+| D16 | Blocked and Failed outcomes, and an Outcomes filter, in Audit Logs | Audit Logs table | Recording refused and failed actions, not only successes | Phase 1 |
+| D17 | Security events (blocked sign-ins, devices), printing and reconciliation, SKANPROOV review events in Audit Logs | Audit Logs | Device tracking, print reconciliation and the Super Admin review exist first | Phase 1 |

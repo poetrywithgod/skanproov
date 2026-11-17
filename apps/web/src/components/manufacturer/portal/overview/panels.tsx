@@ -261,7 +261,9 @@ export function RecentActivity({ o }: { o: Overview }) {
     <section className={`${card} overflow-hidden`} aria-labelledby="recent-activity-title">
       <div className="flex items-center justify-between gap-3 px-6 pb-4 pt-6">
         <h2 id="recent-activity-title" className="text-xl font-semibold text-ink">Recent activity</h2>
-        {/* DEFERRED(D07): link to the Audit Logs screen ("View audit logs") once it exists. */}
+        <Link href={site.manufacturer.audit} className={`${linkClass} inline-flex items-center gap-1.5`}>
+          View audit logs <Arrow />
+        </Link>
       </div>
       {activity.length === 0 ? (
         <p className="border-t border-row-line px-6 py-10 text-center text-sm text-body">Nothing has happened yet. Your team&apos;s actions will appear here.</p>
