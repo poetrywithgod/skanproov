@@ -26,6 +26,7 @@ export default async function ManufacturerPortalLayout({ children }: { children:
     <PortalShell
       showTeam={can(manufacturer, "manage_team")}
       showCodes={can(manufacturer, "generate_codes") || can(manufacturer, "export_codes")}
+      showAudit={can(manufacturer, "view_audit_logs")}
     >
       {children}
     </PortalShell>

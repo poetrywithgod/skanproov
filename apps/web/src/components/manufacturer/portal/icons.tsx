@@ -81,3 +81,10 @@ export const TeamIcon = (p: P) => (
     <path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18 14.3c2.2.7 3.5 2.6 3.5 5.7" />
   </Icon>
 );
+
+export const AuditIcon = (p: P) => (
+  <Icon {...p}>
+    <path d="M6 3h9l4 4v14H6z" />
+    <path d="M14 3v5h5M9 13h7M9 17h5" />
+  </Icon>
+);

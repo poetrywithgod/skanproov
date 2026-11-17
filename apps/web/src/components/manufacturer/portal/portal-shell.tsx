@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { Logo } from "@/components/logo";
 import { site } from "@/lib/site";
-import { BatchesIcon, BellIcon, ChevronIcon, CloseIcon, CodesIcon, MenuIcon, OverviewIcon, ProductsIcon, TeamIcon } from "./icons";
+import { BatchesIcon, BellIcon, ChevronIcon, CloseIcon, CodesIcon, MenuIcon, OverviewIcon, ProductsIcon, TeamIcon, AuditIcon } from "./icons";
 
 type NavItem = {
   label: string;
@@ -14,21 +14,23 @@ type NavItem = {
   /** Missing while the screen has not been built yet; the item then shows as "Soon". */
   href?: string;
   /** Shown only to people whose role allows it. */
-  needs?: "team" | "codes";
+  needs?: "team" | "codes" | "audit";
 };
 
 /**
- * The sidebar, in the order of the design. Audit Logs is drawn in the design but left out until it
- * is built. An item without a link is not built yet; Code Management and Team Management only show
- * for roles that may use them.
+ * The sidebar, in the order of the design. An item without a link is not built yet and shows as
+ * "Soon" (see docs/DEFERRED.md); Code Management and Team Management only show for roles that may
+ * use them.
  */
 const NAV: readonly NavItem[] = [
-  { label: "Overview", icon: OverviewIcon },
+  { label: "Overview", icon: OverviewIcon, href: site.manufacturer.home },
   { label: "Products", icon: ProductsIcon, href: site.manufacturer.products },
   { label: "Batches", icon: BatchesIcon, href: site.manufacturer.batches },
   { label: "Code Management", icon: CodesIcon, href: site.manufacturer.codes, needs: "codes" },
   { label: "Notification", icon: BellIcon, href: site.manufacturer.notifications },
   { label: "Team Management", icon: TeamIcon, href: site.manufacturer.team, needs: "team" },
+  // DEFERRED(D07): Audit Logs screen.
+  { label: "Audit Logs", icon: AuditIcon, needs: "audit" },
 ];
 
 /**
@@ -36,7 +38,7 @@ const NAV: readonly NavItem[] = [
  * shown, on a white plate so the black "SKAN" stays readable on the green. Never replace it with
  * text or a placeholder icon.
  */
-export function PortalShell({ children, showTeam, showCodes }: { children: ReactNode; showTeam: boolean; showCodes: boolean }) {
+export function PortalShell({ children, showTeam, showCodes, showAudit = false }: { children: ReactNode; showTeam: boolean; showCodes: boolean; showAudit?: boolean }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [open, setOpen] = useState(false);
@@ -114,8 +116,8 @@ export function PortalShell({ children, showTeam, showCodes }: { children: React
         </button>
 
         <nav aria-label="Main" className="mt-8 flex-1 space-y-1.5 px-4">
-          {NAV.filter((item) => (item.needs === "team" ? showTeam : item.needs === "codes" ? showCodes : true)).map(({ label, icon: ItemIcon, href }) => {
-            const active = href ? pathname === href || pathname.startsWith(`${href}/`) : false;
+          {NAV.filter((item) => (item.needs === "team" ? showTeam : item.needs === "codes" ? showCodes : item.needs === "audit" ? showAudit : true)).map(({ label, icon: ItemIcon, href }) => {
+            const active = href ? pathname === href || (href !== site.manufacturer.home && pathname.startsWith(`${href}/`)) : false;
             const base = `flex h-12 items-center gap-3 whitespace-nowrap rounded-xl px-4 text-[15px] ${collapsed ? "lg:justify-center lg:px-0" : ""}`;
             const labelClass = collapsed ? "lg:sr-only" : "";
             if (!href) {
@@ -147,6 +149,12 @@ export function PortalShell({ children, showTeam, showCodes }: { children: React
             );
           })}
         </nav>
+
+        {/* DEFERRED(D04): the plan and usage card. Shown as a reminder until plans and billing exist. */}
+        <div className={`mx-4 mb-5 rounded-xl border border-dashed border-white/25 bg-white/5 px-4 py-3 text-white/80 ${collapsed ? "lg:hidden" : ""}`}>
+          <p className="text-[13px] font-medium text-white">Plan &amp; usage</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-white/65">Not connected yet. Appears when plans and billing are set up.</p>
+        </div>
       </aside>
 
       <div className={`transition-[padding] duration-200 ${collapsed ? "lg:pl-20" : "lg:pl-72"}`}>{children}</div>
