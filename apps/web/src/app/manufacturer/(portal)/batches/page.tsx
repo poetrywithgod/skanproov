@@ -5,13 +5,15 @@ import { DeclareBatchButton } from "@/components/manufacturer/portal/batches/bit
 import { InfoNote, PageHeading, StatCard, formatNumber } from "@/components/manufacturer/portal/products/bits";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
 import { getBatches } from "@/lib/manufacturer/batches";
+import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { getProducts } from "@/lib/manufacturer/products";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Batches", robots: { index: false } };
 
 export default async function BatchesPage() {
-  const [batches, products] = await Promise.all([getBatches(), getProducts()]);
+  const [batches, products, manufacturer] = await Promise.all([getBatches(), getProducts(), getManufacturerContext()]);
+  const canDeclare = can(manufacturer, "declare_batches");
   const hasRegistered = products.some((p) => p.status === "registered");
   const released = batches.filter((b) => b.releasedAt).length;
   const units = batches.reduce((sum, b) => sum + (b.units ?? 0), 0);
@@ -24,16 +26,16 @@ export default async function BatchesPage() {
         <PageHeading
           title="Batches"
           subtitle="Declare production runs, generate their codes and release them at dispatch."
-          action={hasRegistered ? <DeclareBatchButton /> : undefined}
+          {...(hasRegistered && canDeclare ? { action: <DeclareBatchButton /> } : {})}
         />
 
         {batches.length === 0 ? (
           <div className="mt-6 rounded-xl border border-line bg-white px-6 py-14 text-center" role="status">
             <p className="text-base font-semibold text-ink">No batches yet</p>
             <p className="mx-auto mt-1 max-w-md text-sm text-muted">
-              {hasRegistered ? "Declare your first production batch to start generating codes." : "Register a product first. Only registered products can have batches."}
+              {!hasRegistered ? "Register a product first. Only registered products can have batches." : canDeclare ? "Declare your first production batch to start generating codes." : "Batches your team declares will appear here."}
             </p>
-            {hasRegistered ? null : (
+            {hasRegistered || !can(manufacturer, "manage_products") ? null : (
               <Link href={`${site.manufacturer.products}/new`} className="mt-4 inline-block text-sm font-semibold text-retail hover:underline">
                 Add a product
               </Link>

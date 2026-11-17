@@ -9,7 +9,7 @@ const STEPS = [
 ] as const;
 
 /** "Your product journey starts here": a manufacturer with no products yet. */
-export function ProductsEmptyState() {
+export function ProductsEmptyState({ canAdd = true }: { canAdd?: boolean }) {
   return (
     <section className="mt-6 rounded-xl border border-line bg-white" aria-label="All products">
       <div className="flex items-baseline gap-3 border-b border-row-line px-6 py-5">
@@ -30,14 +30,20 @@ export function ProductsEmptyState() {
         <p className="mx-auto mt-3 max-w-lg text-base leading-relaxed text-body">
           You haven&rsquo;t added any products yet. Add your first product to register it, declare production batches and protect every unit with authentication codes.
         </p>
-        <Link
-          href={`${site.manufacturer.products}/new`}
-          className="mt-6 inline-flex h-12 items-center gap-2 rounded-xl bg-retail px-6 text-[15px] font-semibold text-white transition hover:bg-retail-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail"
-        >
-          <span aria-hidden="true" className="text-xl leading-none">+</span>
-          Add Product
-        </Link>
-        <p className="mt-3 text-[13px] text-muted">Have your product name, SKU and product image ready.</p>
+        {canAdd ? (
+          <>
+          <Link
+            href={`${site.manufacturer.products}/new`}
+            className="mt-6 inline-flex h-12 items-center gap-2 rounded-xl bg-retail px-6 text-[15px] font-semibold text-white transition hover:bg-retail-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-retail"
+          >
+            <span aria-hidden="true" className="text-xl leading-none">+</span>
+            Add Product
+          </Link>
+          <p className="mt-3 text-[13px] text-muted">Have your product name, SKU and product image ready.</p>
+          </>
+        ) : (
+          <p className="mt-4 text-[13px] text-muted">Ask an Administrator to add your first product.</p>
+        )}
       </div>
 
       <div className="border-t border-row-line bg-[#fafbfa] px-6 py-6">

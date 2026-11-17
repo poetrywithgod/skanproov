@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { Breadcrumb, PageHeading } from "@/components/manufacturer/portal/products/bits";
 import { ProductForm } from "@/components/manufacturer/portal/products/product-form";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
-import { getManufacturerContext } from "@/lib/manufacturer/portal";
+import { NoAccess } from "@/components/manufacturer/portal/team/no-access";
+import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Add product", robots: { index: false } };
@@ -11,6 +12,7 @@ export const metadata: Metadata = { title: "Add product", robots: { index: false
 export default async function NewProductPage() {
   const manufacturer = await getManufacturerContext();
   if (!manufacturer) redirect(site.manufacturer.register);
+  if (!can(manufacturer, "manage_products")) return <NoAccess title="Products" what="You can't add products" />;
   return (
     <>
       <PortalTopBar title="Products" />

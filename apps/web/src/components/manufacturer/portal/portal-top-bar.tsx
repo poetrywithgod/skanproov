@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getNotifications } from "@/lib/manufacturer/notifications";
 import { getManufacturerContext } from "@/lib/manufacturer/portal";
+import { roleLabel } from "@/lib/manufacturer/team-shared";
 import { site } from "@/lib/site";
 import { BellIcon } from "./icons";
 import { requireUser } from "@/lib/supabase/user";
@@ -33,7 +34,7 @@ export async function PortalTopBar({ title }: { title: string }) {
         <UserMenu
           name={user.fullName ?? user.email}
           initials={initials(user.fullName, user.email)}
-          roleLabel={manufacturer?.role === "admin" ? "Administrator" : "Team member"}
+          roleLabel={manufacturer ? roleLabel(manufacturer.role) : "Team member"}
           company={manufacturer?.name ?? ""}
         />
       </div>

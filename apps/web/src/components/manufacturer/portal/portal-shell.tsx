@@ -6,25 +6,29 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { Logo } from "@/components/logo";
 import { site } from "@/lib/site";
-import { BatchesIcon, BellIcon, ChevronIcon, CloseIcon, CodesIcon, MenuIcon, OverviewIcon, ProductsIcon } from "./icons";
+import { BatchesIcon, BellIcon, ChevronIcon, CloseIcon, CodesIcon, MenuIcon, OverviewIcon, ProductsIcon, TeamIcon } from "./icons";
 
 type NavItem = {
   label: string;
   icon: ComponentType<{ className?: string }>;
   /** Missing while the screen has not been built yet; the item then shows as "Soon". */
   href?: string;
+  /** Shown only to people whose role allows it. */
+  needs?: "team" | "codes";
 };
 
 /**
- * The sidebar, in the order of the design. Team Management and Audit Logs are drawn in the design but
- * left out until they are confirmed for Phase 1. An item without a link is not built yet.
+ * The sidebar, in the order of the design. Audit Logs is drawn in the design but left out until it
+ * is built. An item without a link is not built yet; Code Management and Team Management only show
+ * for roles that may use them.
  */
 const NAV: readonly NavItem[] = [
   { label: "Overview", icon: OverviewIcon },
   { label: "Products", icon: ProductsIcon, href: site.manufacturer.products },
   { label: "Batches", icon: BatchesIcon, href: site.manufacturer.batches },
-  { label: "Code Management", icon: CodesIcon, href: site.manufacturer.codes },
+  { label: "Code Management", icon: CodesIcon, href: site.manufacturer.codes, needs: "codes" },
   { label: "Notification", icon: BellIcon, href: site.manufacturer.notifications },
+  { label: "Team Management", icon: TeamIcon, href: site.manufacturer.team, needs: "team" },
 ];
 
 /**
@@ -32,7 +36,7 @@ const NAV: readonly NavItem[] = [
  * shown, on a white plate so the black "SKAN" stays readable on the green. Never replace it with
  * text or a placeholder icon.
  */
-export function PortalShell({ children }: { children: ReactNode }) {
+export function PortalShell({ children, showTeam, showCodes }: { children: ReactNode; showTeam: boolean; showCodes: boolean }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [open, setOpen] = useState(false);
@@ -110,7 +114,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
         </button>
 
         <nav aria-label="Main" className="mt-8 flex-1 space-y-1.5 px-4">
-          {NAV.map(({ label, icon: ItemIcon, href }) => {
+          {NAV.filter((item) => (item.needs === "team" ? showTeam : item.needs === "codes" ? showCodes : true)).map(({ label, icon: ItemIcon, href }) => {
             const active = href ? pathname === href || pathname.startsWith(`${href}/`) : false;
             const base = `flex h-12 items-center gap-3 whitespace-nowrap rounded-xl px-4 text-[15px] ${collapsed ? "lg:justify-center lg:px-0" : ""}`;
             const labelClass = collapsed ? "lg:sr-only" : "";

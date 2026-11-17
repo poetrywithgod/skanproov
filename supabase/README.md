@@ -72,3 +72,4 @@ Email Templates) body to:
 ```
 
 The `/auth/confirm` route already handles `type=recovery`.
+16. `20261116100000_team_management.sql`: Team Management. Four roles (admin, code_manager, compliance_officer, viewer; old `member` becomes `viewer`), member status (active/revoked), `manufacturer_invites` (link fingerprints only, 14 days), `manufacturer_activity` log, `role_can`, `require_permission`, `member_can`, `permission_matrix`, `team_overview`, `team_member_detail`, `invite_member`, `reissue_invite`, `cancel_invite`, `change_member_role`, `revoke_member`, `invite_preview`, `accept_manufacturer_invite`, `touch_member_seen`. `my_manufacturer` now also returns status and permissions. The existing product, batch and code functions are wrapped so they check the caller's role (each original becomes `<name>_core`), and the storage policies follow the same permissions. Run it after `20261114100000_manufacturer_notifications.sql`.

@@ -47,6 +47,8 @@ export const site = {
     batches: "/manufacturer/batches",
     codes: "/manufacturer/code-management",
     notifications: "/manufacturer/notifications",
+    team: "/manufacturer/team",
+    join: "/manufacturer/join", // /manufacturer/join/<token>
   },
   nav: [
     { label: "How it works", href: "#how-it-works" },

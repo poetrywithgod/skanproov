@@ -14,7 +14,7 @@ import { PrimaryButton } from "./primary-button";
 type FieldName = "fullName" | "email" | "phone" | "password" | "confirmPassword";
 type Errors = Partial<Record<FieldName, string>>;
 
-export function RegisterForm({ role = "consumer" }: { role?: RoleId }) {
+export function RegisterForm({ role = "consumer", next }: { role?: RoleId; next?: string | undefined }) {
   const router = useRouter();
   const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
   const [errors, setErrors] = useState<Errors>({});
@@ -56,7 +56,7 @@ export function RegisterForm({ role = "consumer" }: { role?: RoleId }) {
         setConfirmEmail(parsed.data.email);
       } else {
         router.replace(
-          role === "retailer" ? site.retailer.register : role === "manufacturer" ? site.manufacturer.register : site.links.home,
+          next ?? (role === "retailer" ? site.retailer.register : role === "manufacturer" ? site.manufacturer.register : site.links.home),
         );
         router.refresh();
       }
@@ -76,7 +76,7 @@ export function RegisterForm({ role = "consumer" }: { role?: RoleId }) {
           Click it to finish creating your account.
         </p>
         <Link
-          href={`${site.links.login}?as=${role}`}
+          href={`${site.links.login}?as=${role}${next ? `&next=${encodeURIComponent(next)}` : ""}`}
           className="mt-4 inline-block text-sm font-semibold text-brand hover:text-brand-deep hover:underline"
         >
           Back to sign in
@@ -144,7 +144,7 @@ export function RegisterForm({ role = "consumer" }: { role?: RoleId }) {
       <p className="mt-3 text-center text-[15px] font-medium text-ink-title">
         Already have an account?{" "}
         <Link
-          href={`${site.links.login}?as=${role}`}
+          href={`${site.links.login}?as=${role}${next ? `&next=${encodeURIComponent(next)}` : ""}`}
           className="font-semibold text-brand hover:text-brand-deep hover:underline"
         >
           Login

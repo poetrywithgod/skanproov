@@ -6,6 +6,7 @@ import { Pagination } from "@/components/manufacturer/portal/products/pagination
 import { ProductFilters } from "@/components/manufacturer/portal/products/product-filters";
 import { ProductTable } from "@/components/manufacturer/portal/products/product-table";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
+import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { getProducts } from "@/lib/manufacturer/products";
 import { site } from "@/lib/site";
 
@@ -17,7 +18,8 @@ type SearchParams = { q?: string; category?: string; status?: string; sort?: str
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const { q = "", category = "", status = "", sort = "updated", page: pageParam = "1" } = await searchParams;
-  const all = await getProducts();
+  const [all, manufacturer] = await Promise.all([getProducts(), getManufacturerContext()]);
+  const canAdd = can(manufacturer, "manage_products");
 
   const needle = q.trim().toLowerCase();
   const filtered = all
@@ -55,10 +57,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
       <PortalTopBar title="Products" />
       <main className="px-5 py-6 sm:px-8">
         <Breadcrumb current="Product register" />
-        <PageHeading title="Your products" subtitle="Manage your product register, view batches and generate authentication codes." action={<AddProductButton />} />
+        <PageHeading title="Your products" subtitle="Manage your product register, view batches and generate authentication codes." {...(canAdd ? { action: <AddProductButton /> } : {})} />
 
         {all.length === 0 ? (
-          <ProductsEmptyState />
+          <ProductsEmptyState canAdd={canAdd} />
         ) : (
           <>
             <div className="mt-6 grid gap-4 md:grid-cols-3">

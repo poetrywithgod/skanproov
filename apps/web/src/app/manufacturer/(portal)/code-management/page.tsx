@@ -4,8 +4,10 @@ import { GenerateForm, type GenerateProduct } from "@/components/manufacturer/po
 import { RunsTable } from "@/components/manufacturer/portal/codes/runs-table";
 import { PageHeading } from "@/components/manufacturer/portal/products/bits";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
+import { NoAccess } from "@/components/manufacturer/portal/team/no-access";
 import { getBatches } from "@/lib/manufacturer/batches";
 import { getCodeRuns, purgeExpiredCodeFiles } from "@/lib/manufacturer/code-runs";
+import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { site } from "@/lib/site";
 import { ChevronIcon } from "@/components/manufacturer/portal/icons";
 
@@ -15,6 +17,10 @@ export const maxDuration = 60;
 
 export default async function CodeManagementPage({ searchParams }: { searchParams: Promise<{ batch?: string }> }) {
   const { batch: batchParam } = await searchParams;
+  const manufacturer = await getManufacturerContext();
+  const canGenerate = can(manufacturer, "generate_codes");
+  const canExport = can(manufacturer, "export_codes");
+  if (!canGenerate && !canExport) return <NoAccess title="Code Management" what="You can't open Code Management" />;
   await purgeExpiredCodeFiles();
   const [batches, runs] = await Promise.all([getBatches(), getCodeRuns()]);
 
@@ -39,7 +45,7 @@ export default async function CodeManagementPage({ searchParams }: { searchParam
         </nav>
         <PageHeading title="Generate verification codes" subtitle="Create unique, secure codes to protect every product in your batch." />
 
-        {products.length === 0 ? (
+        {!canGenerate ? null : products.length === 0 ? (
           <div className="mt-6 rounded-xl border border-line bg-white px-6 py-14 text-center" role="status">
             <p className="text-base font-semibold text-ink">No batch is ready for codes</p>
             <p className="mx-auto mt-1 max-w-md text-sm text-muted">
@@ -67,7 +73,7 @@ export default async function CodeManagementPage({ searchParams }: { searchParam
             </div>
           ) : (
             <div className="border-t border-row-line">
-              <RunsTable runs={runs.slice(0, 10)} />
+              <RunsTable runs={runs.slice(0, 10)} canExport={canExport} />
             </div>
           )}
           <p className="border-t border-row-line px-6 py-3.5 text-[13px] text-muted">Downloads are available for 30 days.</p>

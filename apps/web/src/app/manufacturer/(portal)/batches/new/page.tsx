@@ -5,7 +5,8 @@ import { BatchForm } from "@/components/manufacturer/portal/batches/batch-form";
 import { BatchesBreadcrumb } from "@/components/manufacturer/portal/batches/bits";
 import { PageHeading } from "@/components/manufacturer/portal/products/bits";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
-import { getManufacturerContext } from "@/lib/manufacturer/portal";
+import { NoAccess } from "@/components/manufacturer/portal/team/no-access";
+import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { getProducts } from "@/lib/manufacturer/products";
 import { site } from "@/lib/site";
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = { title: "Declare batch", robots: { index: fal
 export default async function NewBatchPage({ searchParams }: { searchParams: Promise<{ product?: string }> }) {
   const manufacturer = await getManufacturerContext();
   if (!manufacturer) redirect(site.manufacturer.register);
+  if (!can(manufacturer, "declare_batches")) return <NoAccess title="Batches" what="You can't declare batches" />;
   const { product } = await searchParams;
   const options = (await getProducts())
     .filter((p) => p.status === "registered")

@@ -26,7 +26,7 @@ function DownloadLink({ run, kind, label }: { run: CodeRun; kind: "csv" | "pdf";
 }
 
 /** Recent generations: what was made, by whom, and the files while they are still kept. */
-export function RunsTable({ runs }: { runs: CodeRun[] }) {
+export function RunsTable({ runs, canExport = true }: { runs: CodeRun[]; canExport?: boolean }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[820px] text-left text-[15px]">
@@ -43,7 +43,9 @@ export function RunsTable({ runs }: { runs: CodeRun[] }) {
         </thead>
         <tbody className="divide-y divide-row-line">
           {runs.map((run) => {
+            // Without the export permission the database hides the file paths, so a missing path means "not yours", not "expired".
             const ready = Boolean(run.csvPath && run.pdfPath);
+            const expired = canExport ? !ready : !run.filesExpireAt || new Date(run.filesExpireAt) <= new Date();
             return (
               <tr key={run.id}>
                 <td className="whitespace-nowrap px-6 py-4 font-medium text-ink">{runCode(run.runNo)}</td>
@@ -57,8 +59,8 @@ export function RunsTable({ runs }: { runs: CodeRun[] }) {
                 <td className="whitespace-nowrap px-3 py-4 text-body">{when(run.createdAt)}</td>
                 <td className="px-3 py-4 text-muted">{run.generatedByName ?? "—"}</td>
                 <td className="px-3 py-4">
-                  <span className={`inline-flex rounded-full px-3 py-1 text-[13px] font-medium ${ready ? "bg-retail-soft text-retail-dark" : "bg-pill text-muted"}`}>
-                    {ready ? "Ready" : "Expired"}
+                  <span className={`inline-flex rounded-full px-3 py-1 text-[13px] font-medium ${!expired ? "bg-retail-soft text-retail-dark" : "bg-pill text-muted"}`}>
+                    {!expired ? "Ready" : "Expired"}
                   </span>
                 </td>
                 <td className="px-6 py-4">
@@ -67,6 +69,8 @@ export function RunsTable({ runs }: { runs: CodeRun[] }) {
                       <DownloadLink run={run} kind="csv" label="CSV" />
                       <DownloadLink run={run} kind="pdf" label="Labels" />
                     </div>
+                  ) : !canExport && !expired ? (
+                    <p className="text-right text-xs text-muted">Your role can&apos;t download codes</p>
                   ) : (
                     <p className="text-right text-xs text-muted">Files deleted after 30 days</p>
                   )}

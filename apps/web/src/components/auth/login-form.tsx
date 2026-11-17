@@ -20,7 +20,10 @@ export function LoginForm({
   notice,
   checkMfaOnLoad = false,
   role = null,
+  next,
 }: {
+  /** Where to go after signing in (the invitation page), when the person came from there. */
+  next?: string | undefined;
   /** Which kind of account the person chose on the landing page. */
   role?: RoleId | null;
   initialError?: string;
@@ -43,7 +46,8 @@ export function LoginForm({
 
   function finish() {
     router.replace(
-      role === "manufacturer" ? site.manufacturer.register : role === "retailer" ? site.retailer.home : site.links.home,
+      next ??
+        (role === "manufacturer" ? site.manufacturer.register : role === "retailer" ? site.retailer.home : site.links.home),
     );
     router.refresh();
   }

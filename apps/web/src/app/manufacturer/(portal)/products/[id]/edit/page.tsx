@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { Breadcrumb, PageHeading } from "@/components/manufacturer/portal/products/bits";
 import { ProductForm } from "@/components/manufacturer/portal/products/product-form";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
-import { getManufacturerContext } from "@/lib/manufacturer/portal";
+import { NoAccess } from "@/components/manufacturer/portal/team/no-access";
+import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { getProduct } from "@/lib/manufacturer/products";
 import { site } from "@/lib/site";
 
@@ -13,6 +14,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   const { id } = await params;
   const manufacturer = await getManufacturerContext();
   if (!manufacturer) redirect(site.manufacturer.register);
+  if (!can(manufacturer, "manage_products")) return <NoAccess title="Products" what="You can't edit products" />;
   const product = await getProduct(id);
   if (!product) notFound();
   return (

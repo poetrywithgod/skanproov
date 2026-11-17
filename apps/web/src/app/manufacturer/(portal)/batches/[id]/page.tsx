@@ -7,6 +7,7 @@ import { BATCH_LABEL, BATCH_PILL, batchState } from "@/components/manufacturer/p
 import { InfoNote, PageHeading, StatCard, formatDate, formatNumber } from "@/components/manufacturer/portal/products/bits";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
 import { getBatch, batchCode } from "@/lib/manufacturer/batches";
+import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Batch details", robots: { index: false } };
@@ -22,8 +23,10 @@ function Fact({ label, value }: { label: string; value: string | null }) {
 
 export default async function BatchDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const batch = await getBatch(id);
+  const [batch, manufacturer] = await Promise.all([getBatch(id), getManufacturerContext()]);
   if (!batch) notFound();
+  const canRelease = can(manufacturer, "release_batches");
+  const canGenerate = can(manufacturer, "generate_codes");
 
   const state = batchState(batch);
   const remaining = batch.units ? Math.max(0, batch.units - batch.codesGenerated) : null;
@@ -76,9 +79,13 @@ export default async function BatchDetailsPage({ params }: { params: Promise<{ i
               <p className="mt-2 max-w-xl text-sm text-body">
                 Codes in this batch stay inactive until you release it. Release it when the products are dispatched, so a code cannot verify before the product is out.
               </p>
-              <div className="mt-4">
-                <ReleaseButton batchId={batch.id} batchNumber={batch.batchNumber} {...(disabledReason ? { disabledReason } : {})} />
-              </div>
+              {canRelease ? (
+                <div className="mt-4">
+                  <ReleaseButton batchId={batch.id} batchNumber={batch.batchNumber} {...(disabledReason ? { disabledReason } : {})} />
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-muted">Releasing is done by an Administrator or a Compliance Officer.</p>
+              )}
             </>
           )}
         </section>
@@ -91,7 +98,7 @@ export default async function BatchDetailsPage({ params }: { params: Promise<{ i
             View product
           </Link>
         </div>
-        {!batch.releasedAt && batch.status === "active" && remaining !== null && remaining > 0 ? (
+        {canGenerate && !batch.releasedAt && batch.status === "active" && remaining !== null && remaining > 0 ? (
           <div className="mt-6">
             <Link
               href={`${site.manufacturer.codes}?batch=${batch.id}`}

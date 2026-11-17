@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 import { getRole, parseRole } from "@/lib/roles";
+import { safeNext } from "@/lib/safe-next";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; deleted?: string; mfa?: string; as?: string }> }) {
-  const { error, deleted, mfa, as } = await searchParams;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; deleted?: string; mfa?: string; as?: string; next?: string }> }) {
+  const { error, deleted, mfa, as, next } = await searchParams;
   const role = parseRole(as);
   const chosen = getRole(role);
 
@@ -22,6 +23,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     >
       <LoginForm
         role={role}
+        next={safeNext(next)}
         checkMfaOnLoad={mfa === "1"}
         notice={deleted === "1" ? "Your account has been deleted." : undefined}
         initialError={

@@ -5,6 +5,7 @@ import { BatchTable, batchState } from "@/components/manufacturer/portal/product
 import { AddProductButton, Breadcrumb, InfoNote, PageHeading, ProductThumb, StatCard, StatusPill, formatDate, formatNumber } from "@/components/manufacturer/portal/products/bits";
 import { DeclareBatchButton } from "@/components/manufacturer/portal/batches/bits";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
+import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { getProduct, getProductBatches, productCode } from "@/lib/manufacturer/products";
 import { site } from "@/lib/site";
 
@@ -21,8 +22,10 @@ function Fact({ label, value }: { label: string; value: string | null }) {
 
 export default async function ProductDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = await getProduct(id);
+  const [product, manufacturer] = await Promise.all([getProduct(id), getManufacturerContext()]);
   if (!product) notFound();
+  const canEdit = can(manufacturer, "manage_products");
+  const canDeclare = can(manufacturer, "declare_batches");
   const batches = await getProductBatches(product.id);
 
   const active = batches.filter((b) => batchState(b) === "active").length;
@@ -40,7 +43,13 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
         <PageHeading
           title={product.name}
           subtitle="View product information and manage its associated production batches."
-          action={product.status === "registered" ? <DeclareBatchButton productId={product.id} /> : <AddProductButton />}
+          {...(product.status === "registered"
+            ? canDeclare
+              ? { action: <DeclareBatchButton productId={product.id} /> }
+              : {}
+            : canEdit
+              ? { action: <AddProductButton /> }
+              : {})}
         />
 
         <section className="mt-6 rounded-xl border border-line bg-white" aria-label="Product information">
@@ -83,12 +92,14 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
               <Link href={site.manufacturer.products} className="text-[13px] text-body hover:underline">
                 Back to all products
               </Link>
-              <Link
-                href={`${base}/edit`}
-                className="inline-flex h-10 items-center rounded-lg border border-field-border bg-white px-4 text-sm font-semibold text-ink hover:bg-pill"
-              >
-                {product.status === "draft" ? "Complete setup" : "Edit Product"}
-              </Link>
+              {canEdit ? (
+                <Link
+                  href={`${base}/edit`}
+                  className="inline-flex h-10 items-center rounded-lg border border-field-border bg-white px-4 text-sm font-semibold text-ink hover:bg-pill"
+                >
+                  {product.status === "draft" ? "Complete setup" : "Edit Product"}
+                </Link>
+              ) : null}
             </div>
           </div>
         </section>
@@ -117,7 +128,7 @@ export default async function ProductDetailsPage({ params }: { params: Promise<{
                   ? "Declare a production batch to start generating codes for this product."
                   : "Register this product first. Only registered products can have batches."}
               </p>
-              {product.status === "registered" ? (
+              {product.status === "registered" && canDeclare ? (
                 <div className="mt-4 flex justify-center">
                   <DeclareBatchButton productId={product.id} />
                 </div>
