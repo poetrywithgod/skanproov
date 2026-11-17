@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { Logo } from "@/components/logo";
 import { site } from "@/lib/site";
-import { BatchesIcon, BellIcon, ChevronIcon, CloseIcon, CodesIcon, MenuIcon, OverviewIcon, ProductsIcon, TeamIcon, AuditIcon } from "./icons";
+import { BatchesIcon, BellIcon, ChevronIcon, CloseIcon, CodesIcon, MenuIcon, OverviewIcon, ProductsIcon, TeamIcon, AuditIcon, SettingsIcon } from "./icons";
 
 type NavItem = {
   label: string;
@@ -30,6 +30,7 @@ const NAV: readonly NavItem[] = [
   { label: "Notification", icon: BellIcon, href: site.manufacturer.notifications },
   { label: "Team Management", icon: TeamIcon, href: site.manufacturer.team, needs: "team" },
   { label: "Audit Logs", icon: AuditIcon, href: site.manufacturer.audit, needs: "audit" },
+  { label: "Settings", icon: SettingsIcon, href: site.manufacturer.settings },
 ];
 
 /**

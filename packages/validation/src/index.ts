@@ -11,3 +11,4 @@ export * from "./product";
 export * from "./batch";
 export * from "./codes";
 export * from "./team";
+export * from "./settings";

@@ -88,3 +88,11 @@ export const AuditIcon = (p: P) => (
     <path d="M14 3v5h5M9 13h7M9 17h5" />
   </Icon>
 );
+
+export const SettingsIcon = (p: P) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 2.8v2.4M12 18.8v2.4M4.4 7.4l2.1 1.2M17.5 15.4l2.1 1.2M4.4 16.6l2.1-1.2M17.5 8.6l2.1-1.2" />
+    <circle cx="12" cy="12" r="7.2" />
+  </Icon>
+);

@@ -49,6 +49,7 @@ export const site = {
     notifications: "/manufacturer/notifications",
     team: "/manufacturer/team",
     audit: "/manufacturer/audit-logs",
+    settings: "/manufacturer/settings",
     join: "/manufacturer/join", // /manufacturer/join/<token>
   },
   nav: [

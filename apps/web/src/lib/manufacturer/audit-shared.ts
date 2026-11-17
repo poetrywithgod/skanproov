@@ -8,6 +8,7 @@ export const AUDIT_GROUPS = [
   { value: "codes", label: "Codes & exports" },
   { value: "products", label: "Products" },
   { value: "team", label: "Team & permissions" },
+  { value: "settings", label: "Settings" },
   { value: "audit", label: "Audit log" },
 ] as const;
 
@@ -57,6 +58,7 @@ const CATEGORY: Record<string, string> = {
   role_changed: "Team & permissions",
   member_revoked: "Team & permissions",
   member_joined: "Team & permissions",
+  settings_updated: "Settings",
   audit_exported: "Export",
 };
 
