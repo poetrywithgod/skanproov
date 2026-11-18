@@ -16,7 +16,8 @@ export type VerifyResult =
   | { status: "genuine"; product: ProductDetails; points: number }
   /** Scanned before by someone else. */
   | { status: "duplicate"; product: ProductDetails }
-  | { status: "recalled"; product: ProductDetails }
+  /** `message` is what the manufacturer wrote for shoppers when it recalled or revoked the batch. */
+  | { status: "recalled"; product: ProductDetails; message?: string }
   | { status: "expired"; product: ProductDetails }
   /** We looked and could not confirm it. Never means "fake" on its own; the screen says what to do. */
   | { status: "not_verified" }
@@ -37,6 +38,7 @@ interface RpcResult {
   status: "genuine" | "duplicate" | "recalled" | "expired" | "not_verified";
   product?: RpcProduct;
   points?: number;
+  message?: string | null;
 }
 
 /**
@@ -67,9 +69,9 @@ export async function verifyCode(raw: string): Promise<VerifyResult> {
       manufacturedOn: result.product.manufactured_on,
       expiresOn: result.product.expires_on,
     };
-    return result.status === "genuine"
-      ? { status: "genuine", product, points: result.points ?? 0 }
-      : { status: result.status, product };
+    if (result.status === "genuine") return { status: "genuine", product, points: result.points ?? 0 };
+    if (result.status === "recalled") return result.message ? { status: "recalled", product, message: result.message } : { status: "recalled", product };
+    return { status: result.status, product };
   } catch (error) {
     // Dynamic-rendering signals must reach Next.js; anything else means the check could not run.
     if (error && typeof error === "object" && "digest" in error) throw error;

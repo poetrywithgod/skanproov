@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BatchesBreadcrumb } from "@/components/manufacturer/portal/batches/bits";
+import { RecallPanel } from "@/components/manufacturer/portal/batches/recall-panel";
 import { ReleaseButton } from "@/components/manufacturer/portal/batches/release-button";
 import { BATCH_LABEL, BATCH_PILL, batchState } from "@/components/manufacturer/portal/products/batch-table";
 import { InfoNote, PageHeading, StatCard, formatDate, formatNumber } from "@/components/manufacturer/portal/products/bits";
 import { PortalTopBar } from "@/components/manufacturer/portal/portal-top-bar";
-import { getBatch, batchCode } from "@/lib/manufacturer/batches";
+import { batchReasonLabel } from "@skanproov/validation";
+import { getBatch, getBatchStatusDetail, batchCode } from "@/lib/manufacturer/batches";
 import { can, getManufacturerContext } from "@/lib/manufacturer/portal";
 import { site } from "@/lib/site";
 
@@ -25,6 +27,8 @@ export default async function BatchDetailsPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const [batch, manufacturer] = await Promise.all([getBatch(id), getManufacturerContext()]);
   if (!batch) notFound();
+  const statusDetail = batch.status !== "active" ? await getBatchStatusDetail(id) : null;
+  const canRecall = can(manufacturer, "recall_codes");
   const canRelease = can(manufacturer, "release_batches");
   const canGenerate = can(manufacturer, "generate_codes");
 
@@ -65,6 +69,25 @@ export default async function BatchDetailsPage({ params }: { params: Promise<{ i
           </div>
         </section>
 
+        {batch.status !== "active" ? (
+          <section className="mt-6 rounded-xl border border-danger/30 bg-danger-soft p-6" aria-label={batch.status === "recalled" ? "Recall" : "Revoked"}>
+            <h2 className="text-lg font-semibold text-danger">{batch.status === "recalled" ? "This batch is recalled" : "This batch is revoked"}</h2>
+            <p className="mt-1 text-sm text-body">
+              {batch.status === "recalled"
+                ? "Shoppers and retailers who scan its codes are told it has been recalled."
+                : "Its codes no longer verify, and this can't be undone."}
+            </p>
+            {statusDetail ? (
+              <dl className="mt-4 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                <Fact label="Reason" value={batchReasonLabel(statusDetail.reason)} />
+                <Fact label="By" value={[statusDetail.changedByName, statusDetail.changedAt ? formatDate(statusDetail.changedAt) : null].filter(Boolean).join(" · ") || null} />
+                <div className="sm:col-span-2"><Fact label="Message shown to shoppers and retailers" value={statusDetail.message} /></div>
+                {statusDetail.note ? <div className="sm:col-span-2"><Fact label="Internal note" value={statusDetail.note} /></div> : null}
+              </dl>
+            ) : null}
+          </section>
+        ) : null}
+
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <StatCard value={formatNumber(batch.codesGenerated)} title="Codes generated" note={remaining !== null ? `${formatNumber(remaining)} units awaiting codes` : "No unit count"} />
           <StatCard value={batch.releasedAt ? "Yes" : "No"} title="Released" note={batch.releasedAt ? `On ${formatDate(batch.releasedAt)}` : "Codes do not verify yet"} />
@@ -89,6 +112,22 @@ export default async function BatchDetailsPage({ params }: { params: Promise<{ i
             </>
           )}
         </section>
+
+        {canRecall && batch.status !== "revoked" ? (
+          <section className="mt-6 rounded-xl border border-line bg-white p-6" aria-label="Recall or revoke">
+            <h2 className="text-lg font-semibold text-ink">Recall or revoke</h2>
+            <p className="mt-2 max-w-xl text-sm text-body">
+              {batch.status === "recalled"
+                ? "Lift the recall if it was a mistake, or revoke the batch for good."
+                : batch.releasedAt
+                  ? "Recall the batch if there is a problem with the product (a recall can be lifted). Revoke it if its codes can no longer be trusted (this is final)."
+                  : "This batch isn't released yet, so only revoking applies. Revoking is final."}
+            </p>
+            <div className="mt-4">
+              <RecallPanel batchId={batch.id} batchNumber={batch.batchNumber} status={batch.status} released={Boolean(batch.releasedAt)} />
+            </div>
+          </section>
+        ) : null}
 
         <div className="mt-5 flex items-center gap-4">
           <Link href={site.manufacturer.batches} className="text-[13px] text-body hover:underline">

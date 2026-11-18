@@ -144,6 +144,12 @@ export function ResultView({
               </span>
               <h1 className="mt-3 text-2xl font-bold tracking-normal">{HEADLINES[result.status].title}</h1>
               <p className="mt-1 text-sm text-body">{HEADLINES[result.status].body}</p>
+              {result.status === "recalled" && result.message ? (
+                <p className="mt-3 rounded-xl bg-white/70 px-4 py-3 text-sm font-medium text-ink">
+                  <span className="block text-xs font-semibold text-muted">From {result.product.manufacturer}</span>
+                  {result.message}
+                </p>
+              ) : null}
               <p className="mt-2 text-sm text-body">{HEADLINES[result.status].next}</p>
               <Link
                 href={reportHref}

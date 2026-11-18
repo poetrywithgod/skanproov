@@ -50,6 +50,9 @@ export const rangeDays = (range: string): number | null => AUDIT_RANGES.find((r)
 const CATEGORY: Record<string, string> = {
   batch_declared: "Batch declaration",
   batch_released: "Batch release",
+  batch_recalled: "Batch recall",
+  recall_lifted: "Batch recall",
+  batch_revoked: "Batch revocation",
   codes_generated: "Code generation",
   codes_exported: "Export",
   product_registered: "Product registration",
@@ -67,6 +70,6 @@ export const auditCategory = (kind: string): string => CATEGORY[kind] ?? "Activi
 /** What the reference column's value is. Team events have no reference of their own. */
 export function auditRefType(kind: string): string | null {
   if (kind === "product_registered") return "Product";
-  if (kind.startsWith("batch_") || kind.startsWith("codes_")) return "Batch";
+  if (kind.startsWith("batch_") || kind.startsWith("codes_") || kind === "recall_lifted") return "Batch";
   return null;
 }

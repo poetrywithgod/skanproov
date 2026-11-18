@@ -59,3 +59,23 @@ export const getBatch = cache(async (id: string): Promise<BatchDetail | null> =>
   if (!row) return null;
   return { ...toBatch(row), facility: row.facility, notes: row.notes, certificatePath: row.certificate_path, declaredByName: row.declared_by_name };
 });
+
+export interface BatchStatusDetail {
+  reason: string | null;
+  message: string | null;
+  note: string | null;
+  changedAt: string | null;
+  changedByName: string | null;
+}
+
+/** Why a batch was recalled or revoked, and by whom. Null for an active batch. */
+export const getBatchStatusDetail = cache(async (id: string): Promise<BatchStatusDetail | null> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("batch_status_detail", { p_id: id });
+  if (error) {
+    console.error("Could not load the batch status", error.message);
+    return null;
+  }
+  const r = ((data ?? []) as { reason: string | null; message: string | null; note: string | null; changed_at: string | null; changed_by_name: string | null }[])[0];
+  return r ? { reason: r.reason, message: r.message, note: r.note, changedAt: r.changed_at, changedByName: r.changed_by_name } : null;
+});

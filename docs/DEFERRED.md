@@ -13,7 +13,6 @@ and its reminder.
 | D05 | Seat limit on the team ("7 of 10 seats") | Team Management | Plans and billing (D04) | With D04 |
 | D06 | Invitations sent by e-mail automatically | Team Management, Invite member | A custom e-mail service (SMTP); for now the administrator copies the link | When SMTP is set up |
 | D08 | Billing tab: payment method, billing contact, invoices | Settings > Billing (`manage_billing`) | Payment gateway decision, then D04 | Phase 1 |
-| D09 | Recall and revoke codes action | Role permission `recall_codes` exists but nothing uses it yet | Recall flow design | Phase 1 |
 | D11 | Scheduled clean-up of expired code files | Code Management | Today files are removed only when someone opens Code Management; add a scheduled job | Before launch |
 | D12 | Product and batch review by Super Admin ("Pending review") | Products, Batches | Super Admin app; today products and batches register instantly | Phase 1, Week 12 |
 | D13 | Company approval from the Super Admin app | Register your Company | Super Admin app; today approved by hand with SQL | Phase 1, Week 12 |
