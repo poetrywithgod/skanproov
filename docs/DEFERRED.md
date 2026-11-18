@@ -7,15 +7,13 @@ and its reminder.
 
 | ID | What | Where it shows | Waiting for | Planned |
 |----|------|----------------|-------------|---------|
-| D01 | Scan activity chart (scans per day, authentic share) | Manufacturer Overview | Verification events reaching the manufacturer (consumer and retailer scans stored per batch) | Phase 1, Week 8-9 |
-| D02 | Top scan locations | Manufacturer Overview | Scan location capture and the fraud intelligence engine | Phase 1, Week 11 |
-| D03 | "Suspected counterfeit scans" count and review link | Manufacturer Overview, Needs attention | Fraud rules, alerts and cases | Phase 1, Week 11 |
+| D02 | Top scan locations | Manufacturer Overview | Scans carry only a rough location when a customer opts in, and there is no place lookup to turn it into city names | Phase 1, Week 11 |
+| D03 | "Suspected counterfeit scans" count and review link | Manufacturer Overview, Needs attention and Scan activity note | Fraud rules, alerts and cases (today only repeat scans are counted) | Phase 1, Week 11 |
 | D04 | Plan and usage: plan name, monthly code allowance, batch declaration limit, usage bar | Sidebar plan card, Overview "Codes generated this month", Settings > Subscription & usage | Plans and billing; payment gateway not chosen yet | Phase 1, Week 10 |
 | D05 | Seat limit on the team ("7 of 10 seats") | Team Management | Plans and billing (D04) | With D04 |
 | D06 | Invitations sent by e-mail automatically | Team Management, Invite member | A custom e-mail service (SMTP); for now the administrator copies the link | When SMTP is set up |
 | D08 | Billing tab: payment method, billing contact, invoices | Settings > Billing (`manage_billing`) | Payment gateway decision, then D04 | Phase 1 |
 | D09 | Recall and revoke codes action | Role permission `recall_codes` exists but nothing uses it yet | Recall flow design | Phase 1 |
-| D10 | "Download" next to code-generation entries in Recent activity | Overview, Recent activity | Linking an activity entry to its run | Phase 1 |
 | D11 | Scheduled clean-up of expired code files | Code Management | Today files are removed only when someone opens Code Management; add a scheduled job | Before launch |
 | D12 | Product and batch review by Super Admin ("Pending review") | Products, Batches | Super Admin app; today products and batches register instantly | Phase 1, Week 12 |
 | D13 | Company approval from the Super Admin app | Register your Company | Super Admin app; today approved by hand with SQL | Phase 1, Week 12 |

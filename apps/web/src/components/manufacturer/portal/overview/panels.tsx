@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { productCode } from "@/lib/manufacturer/product-shared";
-import type { Overview } from "@/lib/manufacturer/overview";
+import type { Overview, ScanActivity as Scans } from "@/lib/manufacturer/overview";
 import { site } from "@/lib/site";
 import { BatchesIcon, ChevronIcon, CodesIcon, ProductsIcon, TeamIcon } from "../icons";
 import { formatDate, formatNumber, ProductThumb } from "../products/bits";
@@ -85,6 +85,80 @@ export function DeferredPanel({ id, title, needs, className = "" }: { id: string
         <p className="max-w-sm text-sm leading-relaxed text-body">{needs}</p>
         <p className="mt-2 text-xs text-muted">Tracked as {id} in docs/DEFERRED.md</p>
       </div>
+    </section>
+  );
+}
+
+/* ---------------------------------------------------------------- scan activity */
+
+const shortDay = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+
+export function ScanActivityPanel({ scans }: { scans: Scans | null }) {
+  const first = scans?.days[0]?.day;
+  const last = scans?.days.at(-1)?.day;
+  const share = scans && scans.total > 0 ? (scans.authentic / scans.total) * 100 : null;
+  // A round top for the scale: 10, 20, 50, 100 ... times a step.
+  const max = Math.max(0, ...(scans?.days.map((d) => d.authentic + d.repeat + d.other) ?? []));
+  const top = max <= 4 ? 4 : Math.ceil(max / 10 ** (String(max).length - 1)) * 10 ** (String(max).length - 1);
+  const ticks = [top, (top * 2) / 3, top / 3, 0].map((v) => Math.round(v));
+
+  return (
+    <section className={`${card} p-6`} aria-labelledby="scan-title">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="scan-title" className="text-xl font-semibold text-ink">Scan activity</h2>
+        {first && last ? <p className="text-sm text-body">{shortDay(first)} to {shortDay(last)}</p> : null}
+      </div>
+      {!scans ? (
+        <p className="mt-5 rounded-xl bg-surface-soft px-4 py-10 text-center text-sm text-body" role="status">Scan activity couldn&apos;t be loaded. Please refresh the page.</p>
+      ) : scans.total === 0 ? (
+        <p className="mt-5 rounded-xl border border-dashed border-line-strong px-6 py-12 text-center text-sm leading-relaxed text-body" role="status">
+          No scans of your codes in the last 7 days. Scans appear here once customers verify codes from released batches.
+        </p>
+      ) : (
+        <>
+          <div className="mt-5 flex flex-wrap items-end gap-x-8 gap-y-3">
+            <div>
+              <p className="text-[34px] font-medium leading-none tracking-tight text-ink">{formatNumber(scans.total)}</p>
+              <p className="mt-1.5 text-xs text-muted">Total scans · Last 7 days</p>
+            </div>
+            <div className="border-l border-line pl-8">
+              <p className="text-[34px] font-medium leading-none tracking-tight text-retail-dark">{share === null ? "—" : `${share.toFixed(1)}%`}</p>
+              <p className="mt-1.5 text-xs text-muted">Authentic results</p>
+            </div>
+          </div>
+          <div className="mt-6 flex gap-3" role="img" aria-label={`Scans per day: ${scans.days.map((d) => `${shortDay(d.day)} ${d.authentic + d.repeat + d.other}`).join(", ")}`}>
+            <div className="flex h-[168px] flex-col justify-between pb-6 text-right text-[11px] text-muted" aria-hidden="true">
+              {ticks.map((t, i) => (<span key={i}>{formatNumber(t)}</span>))}
+            </div>
+            <div className="grid flex-1 grid-cols-7 items-end gap-2 border-b border-line" style={{ height: 168 }} aria-hidden="true">
+              {scans.days.map((d, i) => {
+                const total = d.authentic + d.repeat + d.other;
+                const height = top > 0 ? Math.max(total > 0 ? 3 : 0, (total / top) * 144) : 0;
+                return (
+                  <div key={d.day} className="flex h-full flex-col items-center justify-end gap-1.5">
+                    <div className={`w-full max-w-[44px] rounded-t-md ${i === scans.days.length - 1 ? "bg-retail-dark" : "bg-retail/40"}`} style={{ height }} title={`${shortDay(d.day)}: ${total} scans`} />
+                    <span className="text-[11px] text-muted">{shortDay(d.day)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <table className="sr-only">
+            <caption>Scans per day, last 7 days</caption>
+            <thead><tr><th scope="col">Day</th><th scope="col">Authentic</th><th scope="col">Repeat</th><th scope="col">Other</th></tr></thead>
+            <tbody>{scans.days.map((d) => (<tr key={d.day}><th scope="row">{shortDay(d.day)}</th><td>{d.authentic}</td><td>{d.repeat}</td><td>{d.other}</td></tr>))}</tbody>
+          </table>
+          <p className="mt-5 flex flex-wrap gap-x-8 gap-y-1 text-xs text-body">
+            <span><span aria-hidden="true" className="mr-1.5 inline-block size-2 rounded-full bg-retail" />Authentic <strong className="ml-1 font-semibold text-ink">{formatNumber(scans.authentic)}</strong></span>
+            <span><span aria-hidden="true" className="mr-1.5 inline-block size-2 rounded-full bg-[#c77700]" />Repeat scans <strong className="ml-1 font-semibold text-ink">{formatNumber(scans.repeat)}</strong></span>
+            <span><span aria-hidden="true" className="mr-1.5 inline-block size-2 rounded-full bg-line-strong" />Recalled or expired <strong className="ml-1 font-semibold text-ink">{formatNumber(scans.other)}</strong></span>
+          </p>
+        </>
+      )}
+      {/* DEFERRED(D03): a "Suspected counterfeit" count here once fraud rules and alerts exist. */}
+      <p className="mt-4 border-t border-row-line pt-3 text-xs text-muted">
+        Counts one scan per person, code and result, from signed-in customers. Suspected counterfeit scans are not connected yet (D03).
+      </p>
     </section>
   );
 }
@@ -255,7 +329,7 @@ const ACTIVITY_ICON: Record<string, ReactNode> = {
   invite_cancelled: <TeamIcon className="size-5" />,
 };
 
-export function RecentActivity({ o }: { o: Overview }) {
+export function RecentActivity({ o, canExport }: { o: Overview; canExport: boolean }) {
   const activity = o.activity ?? [];
   return (
     <section className={`${card} overflow-hidden`} aria-labelledby="recent-activity-title">
@@ -276,11 +350,16 @@ export function RecentActivity({ o }: { o: Overview }) {
                 <p className="text-[15px] font-medium text-ink">{a.summary}</p>
                 <p className="text-xs text-muted">{a.actorName ? `${a.actorName} · ` : ""}{lagosTime(a.createdAt)}</p>
               </div>
+              {canExport && a.runId ? (
+                <span className="ml-auto flex shrink-0 gap-4 text-sm">
+                  <a href={`${site.manufacturer.codes}/download/${a.runId}/csv`} className={linkClass}>CSV</a>
+                  <a href={`${site.manufacturer.codes}/download/${a.runId}/pdf`} className={linkClass}>Label PDF</a>
+                </span>
+              ) : null}
             </li>
           ))}
         </ul>
       )}
-      {/* DEFERRED(D10): a "Download" link on code-generation entries. */}
       <p className="border-t border-row-line px-6 py-3 text-xs text-muted">CSV and label PDF downloads are available for 30 days, in Code Management.</p>
     </section>
   );

@@ -13,6 +13,24 @@ export interface OverviewActivity {
   summary: string;
   actorName: string | null;
   createdAt: string;
+  /** The code run behind a code-generation entry, while its files are still kept. */
+  runId: string | null;
+}
+
+export interface ScanDay {
+  /** Nigerian calendar day, YYYY-MM-DD. */
+  day: string;
+  authentic: number;
+  repeat: number;
+  other: number;
+}
+
+export interface ScanActivity {
+  days: ScanDay[];
+  total: number;
+  authentic: number;
+  repeat: number;
+  other: number;
 }
 
 export interface Overview {
@@ -26,6 +44,8 @@ export interface Overview {
   pendingReview: ProductListItem[];
   recentBatches: { batch: BatchListItem; imagePath: string | null; latestRun: CodeRun | null; remaining: number }[];
   activity: OverviewActivity[] | null;
+  /** Scans of this company's codes over the last 7 days; null when they could not be loaded. */
+  scans: ScanActivity | null;
   /** The product with the most units still waiting for codes (or the most units declared). */
   focus: { product: ProductListItem; batches: number; declared: number; coded: number } | null;
 }
@@ -46,17 +66,37 @@ async function getActivity(): Promise<OverviewActivity[] | null> {
     if (!/not allowed/i.test(error.message)) console.error("Could not load recent activity", error.message);
     return null;
   }
-  return ((data ?? []) as { id: string; kind: string; summary: string; actor_name: string | null; created_at: string }[]).map((r) => ({
+  return ((data ?? []) as { id: string; kind: string; summary: string; actor_name: string | null; created_at: string; run_id: string | null }[]).map((r) => ({
     id: r.id,
     kind: r.kind,
     summary: r.summary,
     actorName: r.actor_name,
     createdAt: r.created_at,
+    runId: r.run_id,
   }));
 }
 
+async function getScans(): Promise<ScanActivity | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("my_scan_activity", { p_days: 7 });
+  if (error) {
+    console.error("Could not load scan activity", error.message);
+    return null;
+  }
+  const days = ((data ?? []) as { day: string; authentic: number | string; repeat_scans: number | string; other: number | string }[]).map((r) => ({
+    day: r.day,
+    authentic: Number(r.authentic),
+    repeat: Number(r.repeat_scans),
+    other: Number(r.other),
+  }));
+  const authentic = days.reduce((n, d) => n + d.authentic, 0);
+  const repeat = days.reduce((n, d) => n + d.repeat, 0);
+  const other = days.reduce((n, d) => n + d.other, 0);
+  return { days, total: authentic + repeat + other, authentic, repeat, other };
+}
+
 export const getOverview = cache(async (): Promise<Overview> => {
-  const [products, batches, runs, activity] = await Promise.all([getProducts(), getBatches(), getCodeRuns(), getActivity()]);
+  const [products, batches, runs, activity, scans] = await Promise.all([getProducts(), getBatches(), getCodeRuns(), getActivity(), getScans()]);
 
   const thisMonth = lagosMonth(new Date().toISOString());
   const monthRuns = runs.filter((r) => lagosMonth(r.createdAt) === thisMonth);
@@ -104,6 +144,7 @@ export const getOverview = cache(async (): Promise<Overview> => {
       remaining: x.remaining,
     })),
     activity,
+    scans,
     focus: focusProduct && focusStats ? { product: focusProduct, batches: focusStats.batches, declared: focusStats.declared, coded: focusStats.coded } : null,
   };
 });

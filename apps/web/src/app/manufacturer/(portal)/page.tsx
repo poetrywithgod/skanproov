@@ -8,6 +8,7 @@ import {
   ProductProtection,
   RecentActivity,
   RecentBatches,
+  ScanActivityPanel,
   StatRow,
 } from "@/components/manufacturer/portal/overview/panels";
 import { CodesIcon } from "@/components/manufacturer/portal/icons";
@@ -60,8 +61,7 @@ export default async function ManufacturerOverviewPage() {
         <StatRow o={o} />
 
         <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-          {/* DEFERRED(D01): the scan activity chart. */}
-          <DeferredPanel id="D01" title="Scan activity" needs="Scans per day and the share of authentic results will appear here once customers and retailers verify your codes and those results are stored per batch." />
+          <ScanActivityPanel scans={o.scans} />
           <NeedsAttention
             o={o}
             canGenerate={canGenerate}
@@ -73,11 +73,11 @@ export default async function ManufacturerOverviewPage() {
         <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <RecentBatches o={o} canGenerate={canGenerate} />
           {/* DEFERRED(D02): top scan locations. */}
-          <DeferredPanel id="D02" title="Top scan locations" needs="Where your products are scanned, by city, will appear here once scan locations are captured and the fraud intelligence engine is running." />
+          <DeferredPanel id="D02" title="Top scan locations" needs="Where your products are scanned, by city, will appear here. Scans only carry a rough location when a customer opts in, and turning that into city names needs a place lookup that isn't set up yet." />
         </div>
 
         <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-          {o.activity ? <RecentActivity o={o} /> : <div className="hidden xl:block" />}
+          {o.activity ? <RecentActivity o={o} canExport={can(manufacturer, "export_codes")} /> : <div className="hidden xl:block" />}
           <ProductProtection o={o} />
         </div>
       </main>
